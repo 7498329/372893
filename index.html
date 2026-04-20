@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript 基础练习</title>
+    <style>
+        body {
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .tip {
+            text-align: center;
+            color: #e74c3c;
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #fdf2f2;
+            border-radius: 5px;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>JavaScript 基础练习</h1>
+        <div class="tip">打开浏览器控制台查看练习结果</div>
+    </div>
+
+    <script>
+        console.log("========== JavaScript 基础练习开始 ==========\n");
+
+        // 1. 变量的定义
+        console.log("--- 1. 变量的定义 ---");
+        var varName = "使用 var 定义的变量";
+        let letAge = 25;
+        const constPI = 3.14159;
+
+        console.log("var 变量:", varName);
+        console.log("let 变量:", letAge);
+        console.log("const 变量:", constPI);
+
+        letAge = 26;
+        console.log("let 变量重新赋值后:", letAge);
+        // constPI = 3.14; // 这行会报错，const 不可重新赋值
+        console.log("const 常量不可重新赋值");
+
+        // 2. 变量类型
+        console.log("\n--- 2. 变量类型 ---");
+        let str = "Hello, JS";
+        let num = 100;
+        let floatNum = 99.9;
+        let bool = true;
+        let arr = [1, 2, 3, 4, 5];
+        let obj = { name: "张三", age: 20 };
+        let n = null;
+        let u;
+
+        console.log("字符串:", str, "- 类型:", typeof str);
+        console.log("整数:", num, "- 类型:", typeof num);
+        console.log("浮点数:", floatNum, "- 类型:", typeof floatNum);
+        console.log("布尔值:", bool, "- 类型:", typeof bool);
+        console.log("数组:", arr, "- 类型:", typeof arr);
+        console.log("对象:", obj, "- 类型:", typeof obj);
+        console.log("null:", n, "- 类型:", typeof n);
+        console.log("未定义:", u, "- 类型:", typeof u);
+
+        // 3. 表达式
+        console.log("\n--- 3. 表达式 ---");
+        let a = 10;
+        let b = 3;
+
+        console.log("算术表达式:");
+        console.log("a + b =", a + b);
+        console.log("a - b =", a - b);
+        console.log("a * b =", a * b);
+        console.log("a / b =", a / b);
+        console.log("a % b =", a % b);
+
+        console.log("\n比较表达式:");
+        console.log("a > b:", a > b);
+        console.log("a === 10:", a === 10);
+        console.log("a !== b:", a !== b);
+
+        console.log("\n逻辑表达式:");
+        console.log("true && false:", true && false);
+        console.log("true || false:", true || false);
+        console.log("!true:", !true);
+
+        // 4. 流程控制
+        console.log("\n--- 4. 流程控制 ---");
+
+        // if-else
+        let score = 85;
+        console.log("成绩:", score);
+        if (score >= 90) {
+            console.log("等级: 优秀");
+        } else if (score >= 80) {
+            console.log("等级: 良好");
+        } else if (score >= 60) {
+            console.log("等级: 及格");
+        } else {
+            console.log("等级: 不及格");
+        }
+
+        // switch
+        let day = 3;
+        let dayName;
+        switch (day) {
+            case 1: dayName = "星期一"; break;
+            case 2: dayName = "星期二"; break;
+            case 3: dayName = "星期三"; break;
+            case 4: dayName = "星期四"; break;
+            case 5: dayName = "星期五"; break;
+            default: dayName = "周末";
+        }
+        console.log("switch 结果: 第", day, "天是", dayName);
+
+        // for 循环
+        console.log("for 循环输出 1 到 5:");
+        for (let i = 1; i <= 5; i++) {
+            console.log("  i =", i);
+        }
+
+        // while 循环
+        console.log("while 循环输出:");
+        let count = 0;
+        while (count < 3) {
+            console.log("  count =", count);
+            count++;
+        }
+
+        // 5. 函数
+        console.log("\n--- 5. 函数 ---");
+
+        // 函数声明
+        function greet(name) {
+            return "你好, " + name + "!";
+        }
+        console.log("函数声明:", greet("JavaScript"));
+
+        // 函数表达式
+        const add = function(x, y) {
+            return x + y;
+        };
+        console.log("函数表达式: add(5, 3) =", add(5, 3));
+
+        // 箭头函数
+        const multiply = (x, y) => x * y;
+        console.log("箭头函数: multiply(4, 5) =", multiply(4, 5));
+
+        // 默认参数
+        function introduce(name, age = 18) {
+            return "我叫" + name + ", 今年" + age + "岁";
+        }
+        console.log("默认参数:", introduce("李四"));
+        console.log("传入参数:", introduce("王五", 25));
+
+        // 递归函数
+        function factorial(n) {
+            if (n <= 1) return 1;
+            return n * factorial(n - 1);
+        }
+        console.log("递归函数: 5! =", factorial(5));
+
+        console.log("\n========== JavaScript 基础练习结束 ==========");
+    </script>
+</body>
+</html>
