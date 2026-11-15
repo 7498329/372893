@@ -1,0 +1,1637 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#e8dcc2">
+<title>兰州牛肉面 · 一碗面的十二种活法</title>
+<meta name="description" content="一清二白三红四绿五黄。翻开十二块面馆木牌，把牛肉、萝卜、蒜苗和鲜面一样样放进碗里，再顺着一条面条走完这碗面的两百年。">
+<meta name="format-detection" content="telephone=no,email=no,address=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="mobile-web-app-capable" content="yes">
+<meta property="og:type" content="website">
+<meta property="og:title" content="兰州牛肉面 · 一碗面的十二种活法">
+<meta property="og:description" content="一清二白三红四绿五黄。一根面，十二种脾气，二百年烟火。">
+<meta property="og:image" content="assets/cover.webp">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="apple-touch-icon" href="assets/cover.webp">
+<link rel="preload" as="image" href="assets/cover.webp" fetchpriority="high">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23efe3c8'/%3E%3Ccircle cx='32' cy='30' r='19' fill='none' stroke='%235d827e' stroke-width='3.2'/%3E%3Cpath d='M18 30q7-7 14 0t14 0' fill='none' stroke='%23b83b2b' stroke-width='3.2' stroke-linecap='round'/%3E%3Cpath d='M21 40h22' stroke='%235d827e' stroke-width='2.6' stroke-linecap='round'/%3E%3C/svg%3E">
+<style>
+/* ============ 设计令牌 ============ */
+:root{
+  --paper:#efe3c8;
+  --paper-hi:#faf3e1;
+  --ink:#2b241c;
+  --ink2:#4d4133;
+  --ink3:#8a7861;
+  --teal:#5d827e;
+  --teal-l:#94b3ae;
+  --chili:#b83b2b;
+  --chili-l:#d4634a;
+  --wood:#c9853f;
+  --serif:"Songti SC","STSong","Source Han Serif SC","Noto Serif SC","STZhongsong","SimSun",serif;
+  --sans:"PingFang SC","Hiragino Sans GB","Source Han Sans SC","Noto Sans SC","Microsoft YaHei",sans-serif;
+  --ease:cubic-bezier(.32,.72,.30,1);
+  --spring:cubic-bezier(.34,1.42,.64,1);
+}
+
+*,*::before,*::after{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;height:100%;overflow:hidden}
+body{
+  font-family:var(--sans);color:var(--ink);
+  background:#e4d7bc url("assets/paper.webp") center/cover no-repeat;
+  -webkit-user-select:none;user-select:none;
+  -webkit-font-smoothing:antialiased;
+}
+#bg{
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(130% 95% at 50% 42%,rgba(253,248,234,.55) 0%,rgba(251,244,226,.26) 46%,rgba(206,184,146,.38) 100%);
+}
+button{font-family:inherit;color:inherit;border:0;background:none;padding:0;cursor:pointer}
+
+/* ============ 开场遮罩（等封面解码，避免白闪与素材弹入） ============ */
+#veil{
+  position:fixed;inset:0;z-index:900;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;
+  background:#efe3c8 url("assets/paper.webp") center/cover no-repeat;
+  transition:opacity .62s ease,visibility .62s;
+  /* 兜底：万一脚本没跑起来，遮罩 3.4s 后自己消失，绝不把人挡在门外 */
+  animation:veilAuto 0s linear 3.4s forwards;
+}
+@keyframes veilAuto{to{opacity:0;visibility:hidden;pointer-events:none}}
+#veil::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(120% 90% at 50% 46%,rgba(253,248,234,.72) 0%,rgba(233,220,192,.30) 62%,rgba(206,184,146,.34) 100%);
+}
+#veil.gone{opacity:0;visibility:hidden;pointer-events:none}
+.vSeal{
+  position:relative;z-index:1;
+  width:58px;height:58px;display:grid;place-items:center;
+  font-family:var(--serif);font-size:29px;font-weight:700;color:var(--chili);
+  border:1.6px solid rgba(184,59,43,.62);border-radius:3px;
+  background:rgba(184,59,43,.05);
+  margin-bottom:20px;
+}
+.vName{
+  position:relative;z-index:1;
+  font-family:var(--serif);font-size:31px;letter-spacing:.34em;text-indent:.34em;
+  color:var(--ink);line-height:1;
+}
+.vTip{
+  position:relative;z-index:1;
+  margin-top:16px;font-size:15px;letter-spacing:.40em;text-indent:.40em;
+  color:var(--ink3);font-weight:300;
+}
+.vLine{
+  position:relative;z-index:1;display:block;
+  width:132px;height:2px;margin-top:26px;border-radius:2px;overflow:hidden;
+  background:rgba(96,74,46,.16);
+}
+.vLine b{
+  position:absolute;left:0;top:0;height:100%;width:38%;border-radius:2px;
+  background:linear-gradient(90deg,rgba(184,59,43,0),rgba(184,59,43,.72),rgba(184,59,43,0));
+  animation:veilRun 1.25s ease-in-out infinite;
+}
+@keyframes veilRun{0%{transform:translateX(-105%)}100%{transform:translateX(305%)}}
+
+/* ============ 舞台 ============ */
+.stage{
+  position:absolute;left:50%;top:50%;transform-origin:50% 50%;z-index:2;
+  opacity:0;transition:opacity .45s ease;
+  /* 关键：未启用的舞台必须彻底让开点击，否则上层那块 1334×750 的透明舞台
+     会把下层的按钮全挡住（竖屏页点不动就是这个原因） */
+  pointer-events:none;
+}
+.stage.live{opacity:1;pointer-events:auto}
+#stageP{width:750px;height:1334px}
+#stageL{width:1334px;height:750px}
+.stage::after{
+  content:"";position:absolute;inset:0;pointer-events:none;z-index:60;
+  box-shadow:inset 0 0 100px rgba(93,68,38,.13),inset 0 0 0 1px rgba(96,74,46,.14);
+}
+.page{position:absolute;inset:0;opacity:0;pointer-events:none;overflow:hidden;transition:opacity .3s ease}
+.page.slow{transition:opacity .72s var(--ease)}
+.page.on{opacity:1;pointer-events:auto}
+
+/* ============ 通用小件 ============ */
+.seal{
+  display:grid;place-items:center;border:2px solid var(--chili);border-radius:3px;
+  color:var(--chili);font-family:var(--serif);font-weight:700;
+  writing-mode:vertical-rl;text-orientation:upright;letter-spacing:.04em;
+  opacity:.82;line-height:1.05;
+}
+.rule{height:1px;background:linear-gradient(90deg,transparent,rgba(96,74,46,.30),transparent)}
+
+.nextBtn{
+  position:absolute;right:34px;bottom:30px;z-index:40;
+  display:flex;align-items:center;gap:9px;
+  padding:12px 20px 12px 24px;border-radius:40px;
+  font-size:20px;letter-spacing:.16em;color:var(--ink2);
+  background:rgba(253,247,233,.60);
+  border:1px solid rgba(96,74,46,.26);
+  backdrop-filter:blur(3px);
+  box-shadow:0 3px 14px rgba(96,68,36,.10);
+  transition:transform .26s var(--spring),background .26s ease,box-shadow .26s ease;
+}
+.nextBtn svg{width:19px;height:12px;stroke:currentColor;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.nextBtn:active{transform:scale(.94);background:rgba(253,247,233,.92)}
+.nextBtn.is-idle{opacity:.34}
+
+/* 页面指示 */
+.dots{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);display:flex;gap:9px;z-index:40;pointer-events:none}
+.dot{width:5px;height:5px;border-radius:50%;background:rgba(96,74,46,.26);transition:all .45s var(--ease)}
+.dot.on{width:17px;border-radius:3px;background:var(--chili)}
+
+/* ============ P1 封面 ============ */
+#p1{background:#e9dcc0}
+#p1 .cover{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;transform-origin:50% 46%}
+#p1.on .cover{animation:coverIn .8s var(--ease) both}
+@keyframes coverIn{from{opacity:0;transform:scale(1.05)}to{opacity:1;transform:scale(1)}}
+
+/* 第二层：只裁出「碗与面」那半幅，接缝落在副标题下方的空白纸面，
+   入场结束后淡入（与底层像素完全重合，看不出接缝），再过一会儿轻颠三下 */
+#p1 .coverJump{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;
+  -webkit-clip-path:inset(27.7% 0 0 0);clip-path:inset(27.7% 0 0 0);
+  opacity:0;pointer-events:none;will-change:transform;
+}
+#p1.on .coverJump{
+  animation:jumpFade .2s linear .86s both,
+            coverHopY 3.05s cubic-bezier(.4,.05,.32,1) 1.1s both;
+}
+@keyframes jumpFade{from{opacity:0}to{opacity:1}}
+/* 只做纯位移：海报里的黄底按钮与 HTML 按钮必须严丝合缝，
+   任何缩放都会让两者错开一两个像素 */
+@keyframes coverHopY{
+  0%,   5%  {transform:translateY(0)}
+  14%       {transform:translateY(-18px)}
+  25%       {transform:translateY(0)}
+  32%       {transform:translateY(-9px)}
+  41%       {transform:translateY(0)}
+  48%       {transform:translateY(-4px)}
+  57%, 100% {transform:translateY(0)}
+}
+/* 「开始制作」按钮跟封面同幅跳动，位移量与节奏完全一致 */
+@keyframes hopSyncY{
+  0%,   5%  {transform:translate(-50%,-50%)}
+  14%       {transform:translate(-50%,calc(-50% - 18px))}
+  25%       {transform:translate(-50%,-50%)}
+  32%       {transform:translate(-50%,calc(-50% - 9px))}
+  41%       {transform:translate(-50%,-50%)}
+  48%       {transform:translate(-50%,calc(-50% - 4px))}
+  57%, 100% {transform:translate(-50%,-50%)}
+}
+#p1.on .startWrap{animation:hopSyncY 3.05s cubic-bezier(.4,.05,.32,1) 1.1s both}
+#p1.on .startWrap.hopDone{animation:none}
+#p1 .coverJump.hopDone{animation:none;opacity:1}
+
+.startWrap{position:absolute;left:50.55%;top:88.35%;width:44.6%;transform:translate(-50%,-50%);z-index:20}
+.startWrap::before{ /* 呼吸光晕 */
+  content:"";position:absolute;inset:-16px -12px;border-radius:60px;
+  background:radial-gradient(50% 50% at 50% 50%,rgba(255,203,60,.55),rgba(255,203,60,0) 72%);
+  filter:blur(2px);opacity:.5;
+  animation:halo 3.4s ease-in-out 1.4s infinite;
+}
+@keyframes halo{0%,100%{opacity:.28;transform:scale(.97)}50%{opacity:.72;transform:scale(1.03)}}
+.startBtn{
+  position:relative;display:block;width:100%;
+  transition:transform .26s var(--spring),filter .26s ease;
+  filter:drop-shadow(0 6px 12px rgba(120,72,20,.22));
+}
+.startBtn img{display:block;width:100%;height:auto}
+.startBtn span{
+  position:absolute;inset:0;display:grid;place-items:center;
+  font-family:var(--serif);font-weight:700;font-size:39px;letter-spacing:.15em;
+  text-indent:.15em;color:#241a10;
+}
+.startBtn:active{transform:scale(.95);filter:drop-shadow(0 2px 6px rgba(120,72,20,.26))}
+
+.arrowHint{
+  position:absolute;left:50%;top:94.1%;transform:translateX(-50%);
+  z-index:19;opacity:0;animation:hintIn .9s var(--ease) 1s forwards;
+}
+@keyframes hintIn{from{opacity:0;transform:translate(-50%,12px)}to{opacity:1;transform:translate(-50%,0)}}
+.arrowHint svg{display:block;width:40px;height:40px;stroke:#3a2d1e;stroke-width:2.5;fill:none;
+  stroke-linecap:round;stroke-linejoin:round;opacity:.66;
+  animation:bob 2.1s ease-in-out 1.9s infinite}
+.arrowHint svg path:last-child{opacity:.36}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(7px)}}
+
+/* ============ P2/P3 面型翻牌 ============ */
+.lpHead{position:absolute;left:0;right:0;top:16px;height:104px;display:flex;align-items:center;justify-content:center}
+.lpHead .sign{display:block;width:330px;height:auto;filter:drop-shadow(0 5px 10px rgba(120,72,20,.20))}
+.tagL,.tagR{
+  position:absolute;top:50%;transform:translateY(-50%);
+  font-family:var(--serif);font-size:18px;letter-spacing:.3em;color:var(--ink3);
+  white-space:nowrap;
+}
+.tagL{left:54px}
+.tagR{right:54px;letter-spacing:.18em}
+.tagR b{color:var(--chili);font-weight:600;font-size:22px;padding:0 2px}
+.sideCol{
+  position:absolute;top:124px;bottom:26px;display:flex;align-items:center;justify-content:center;
+}
+.sideCol .v{
+  writing-mode:vertical-rl;text-orientation:upright;
+  font-family:var(--serif);letter-spacing:.36em;font-size:21px;line-height:1;
+  color:rgba(93,130,126,.58);
+}
+.sideCol.l{left:46px;width:60px}
+.sideCol.r{right:46px;width:60px}
+.sideCol.r .v{color:rgba(96,74,46,.40);font-size:18px;letter-spacing:.30em}
+
+.grid{
+  position:absolute;left:50%;top:450px;transform:translate(-50%,-50%);
+  display:grid;grid-template-columns:repeat(3,var(--cw));grid-auto-rows:var(--ch);
+  gap:22px 52px;perspective:1500px;
+}
+#p2,#p3{--cw:172px;--ch:276px}
+
+.card{
+  position:relative;width:var(--cw);height:var(--ch);
+  background:none;transition:opacity .4s ease,filter .4s ease;z-index:1;
+}
+.card .lift{
+  position:absolute;inset:0;transition:transform .46s var(--spring);
+  transform-origin:50% 50%;
+}
+.card .inner{
+  position:absolute;inset:0;transform-style:preserve-3d;
+  transition:transform .92s cubic-bezier(.30,.78,.32,1);
+  will-change:transform;
+}
+.card .face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.card .face img{display:block;width:100%;height:100%;object-fit:contain}
+.card .face.back{transform:rotateY(180deg)}
+.card.focus{z-index:9}
+.card.focus .lift{transform:scale(1.145);filter:drop-shadow(0 16px 26px rgba(96,62,24,.26))}
+.grid.hasFocus .card:not(.focus){opacity:.88}
+
+.vtxt{
+  position:absolute;left:25%;right:11%;top:12%;bottom:10%;
+  writing-mode:vertical-rl;text-orientation:upright;
+  font-size:20px;line-height:1.46;color:#3f2a16;
+  font-family:var(--serif);letter-spacing:0;
+  padding-top:4px;
+  overflow:hidden;
+}
+.vtxt b{font-weight:600;color:#7c3a1c}
+.seal2{
+  position:absolute;left:8.5%;bottom:9%;width:31px;height:31px;
+  font-size:12px;letter-spacing:0;border-width:1.5px;border-radius:2px;
+  background:rgba(184,59,43,.05);
+}
+
+/* ============ P4 拖拽成面 ============ */
+.p4Top{position:absolute;left:50%;top:24px;transform:translateX(-50%);text-align:center}
+.p4Top .t{font-family:var(--serif);font-size:30px;letter-spacing:.26em;text-indent:.26em;color:var(--ink)}
+.p4Top .s{margin-top:6px;font-size:16px;letter-spacing:.24em;color:var(--ink3)}
+
+.bowlArea{position:absolute;left:50%;top:400px;transform:translate(-50%,-50%);width:430px;height:357px}
+.bowlArea .bowl{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;
+  filter:drop-shadow(0 14px 22px rgba(80,52,20,.20))}
+.bowlArea .full{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;
+  opacity:0;transform:scale(1.035);transition:opacity 1s var(--ease),transform 1.3s var(--ease);
+  filter:drop-shadow(0 16px 26px rgba(80,52,20,.24))}
+.bowlArea.done .full{opacity:1;transform:scale(1)}
+.bowlArea .rain{position:absolute;left:50%;top:50%;width:1px;height:1px}
+.bowlArea .target{
+  position:absolute;left:50%;top:50%;width:310px;height:238px;
+  transform:translate(-50%,-50%);border-radius:50%;
+  border:2px dashed rgba(184,59,43,.20);
+  opacity:1;transition:opacity .7s ease;
+  animation:breathe 3.4s ease-in-out infinite;
+}
+@keyframes breathe{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.5}
+  50%{transform:translate(-50%,-50%) scale(1.035);opacity:.9}}
+.bowlArea.done .target{opacity:0;animation:none}
+
+.steam{position:absolute;left:50%;bottom:calc(100% - 82px);transform:translateX(-50%);
+  width:330px;height:250px;pointer-events:none;opacity:0;transition:opacity 1s ease}
+.bowlArea.done .steam{opacity:1}
+.wisp{
+  position:absolute;bottom:0;width:64px;height:120px;border-radius:50%;
+  background:radial-gradient(50% 46% at 50% 52%,rgba(255,255,255,.98) 0%,rgba(255,255,255,.72) 42%,rgba(255,255,255,0) 76%);
+  filter:blur(5px);opacity:0;
+  animation:rise 3.8s ease-in-out infinite;
+}
+@keyframes rise{
+  0%{opacity:0;transform:translateY(18px) scale(.65,.55)}
+  20%{opacity:.95}
+  68%{opacity:.5}
+  100%{opacity:0;transform:translateY(-132px) scale(1.5,1.75)}
+}
+
+.tray{position:absolute;inset:0;z-index:8}
+.chip{
+  position:absolute;display:flex;flex-direction:column;align-items:center;
+  touch-action:none;cursor:grab;z-index:12;
+  transition:transform .48s var(--spring),opacity .4s ease;
+  will-change:transform;
+}
+.chip img{display:block;pointer-events:none;filter:drop-shadow(0 7px 12px rgba(88,58,24,.24))}
+.chip .cap{
+  margin-top:8px;font-size:19px;letter-spacing:.2em;text-indent:.2em;color:var(--ink2);
+  font-family:var(--serif);white-space:nowrap;
+  padding:3px 12px;border-radius:20px;background:rgba(253,247,233,.55);
+  border:1px solid rgba(96,74,46,.16);
+}
+.chip.dragging{transition:none;cursor:grabbing;z-index:30}
+.chip.dragging img{filter:drop-shadow(0 18px 22px rgba(88,58,24,.34))}
+.chip.placed .cap{opacity:0;transform:translateY(6px)}
+.chip.placed{z-index:6;pointer-events:none}
+/* 落入碗中的食材：加一层贴身暖影，白萝卜这种浅色料也能从白瓷碗里立起来 */
+.chip.placed img{position:relative;z-index:1;filter:drop-shadow(0 3px 4px rgba(86,50,16,.62)) drop-shadow(0 0 2.5px rgba(86,50,16,.42))}
+/* 落碗后给一块「接触影」，浅色料也能稳稳坐在碗里，而不是浮着 */
+.chip.placed::after{
+  content:'';position:absolute;left:50%;top:52%;width:86%;height:36%;
+  transform:translate(-50%,0);border-radius:50%;z-index:0;pointer-events:none;
+  background:radial-gradient(50% 50% at 50% 50%,rgba(84,46,12,.27) 0%,rgba(84,46,12,.13) 46%,rgba(84,46,12,0) 76%);
+}
+.chip.gone{opacity:0!important;pointer-events:none!important}
+.chip.ghost{opacity:0;transform:scale(.6);pointer-events:none}
+
+/* 碗内壁的极淡暗角，给白萝卜一点底色依托（压在面碗之上、食材之下） */
+.bowlShade{
+  position:absolute;left:50%;top:50%;width:300px;height:236px;
+  transform:translate(-50%,-50%);border-radius:50%;pointer-events:none;
+  background:radial-gradient(56% 54% at 50% 58%,rgba(104,72,38,.17) 0%,rgba(104,72,38,.085) 44%,rgba(104,72,38,0) 74%);
+  opacity:1;transition:opacity .6s ease;
+}
+.bowlArea.done .bowlShade{opacity:0}
+
+.ripple{
+  position:absolute;border-radius:50%;pointer-events:none;
+  border:2px solid rgba(255,255,255,.9);
+  animation:ripple .75s var(--ease) forwards;
+}
+@keyframes ripple{
+  from{opacity:.9;transform:translate(-50%,-50%) scale(.2)}
+  to{opacity:0;transform:translate(-50%,-50%) scale(1.7)}
+}
+.toast{
+  position:absolute;left:52px;top:296px;z-index:45;
+  padding:16px 24px;border-radius:4px;
+  background:rgba(253,247,233,.92);
+  border:1px solid rgba(96,74,46,.24);
+  box-shadow:0 10px 26px rgba(88,58,24,.18);
+  font-family:var(--serif);font-size:26px;letter-spacing:.13em;color:#3f2a16;
+  opacity:0;transform:translateY(12px) scale(.96);
+  transition:opacity .6s var(--ease),transform .6s var(--spring);
+  pointer-events:none;
+}
+.toast::after{
+  content:"";position:absolute;right:-9px;top:50%;width:14px;height:14px;
+  background:inherit;border-right:1px solid rgba(96,74,46,.24);border-top:1px solid rgba(96,74,46,.24);
+  transform:translateY(-50%) rotate(45deg);
+}
+.toast.show{opacity:1;transform:translateY(0) scale(1)}
+
+/* ============ P5 时间轴 ============ */
+#p5{overflow:hidden}
+.tlTop{position:absolute;left:56px;top:30px;z-index:30}
+.tlTop .k{font-family:var(--serif);font-size:18px;letter-spacing:.42em;color:var(--teal)}
+.tlTop .t{font-family:var(--serif);font-size:36px;letter-spacing:.14em;color:var(--ink);margin-top:4px}
+.tlSeal{position:absolute;right:56px;top:30px;z-index:30;width:50px;height:50px;font-size:19px}
+.tlViewport{position:absolute;inset:0;overflow:hidden;touch-action:pan-y;cursor:grab}
+.tlViewport.drag{cursor:grabbing}
+.tlTrack{position:absolute;left:0;top:0;height:750px;will-change:transform}
+.tlTrack.anim{transition:transform .52s var(--ease)}
+.tlSvg{position:absolute;left:0;top:0;pointer-events:none;
+  filter:drop-shadow(0 8px 10px rgba(120,84,38,.15))}
+.tlSvg .dye{opacity:0;transition:opacity .45s ease}
+.tlSvg.dyeing .dye{opacity:1}
+
+.tlNode{
+  position:absolute;width:58px;height:58px;margin:-29px 0 0 -29px;z-index:20;
+  display:grid;place-items:center;border-radius:50%;
+  transition:transform .42s var(--spring);
+}
+.tlNode .ring{
+  position:absolute;inset:0;border-radius:50%;
+  border:1.5px solid rgba(184,59,43,.52);
+  background:radial-gradient(50% 50% at 50% 50%,rgba(253,247,233,.97),rgba(250,242,226,.86));
+  box-shadow:0 3px 10px rgba(96,62,24,.22);
+  transition:all .4s var(--ease);
+}
+.tlNode .num{position:relative;font-family:var(--serif);font-size:19px;color:var(--chili);font-weight:700}
+.tlNode .lb{
+  position:absolute;left:50%;top:64px;transform:translateX(-50%);
+  font-family:var(--serif);font-size:14px;letter-spacing:.18em;color:var(--ink3);
+  white-space:nowrap;opacity:.85;transition:opacity .35s ease;
+}
+.tlNode::after{
+  content:"";position:absolute;inset:-9px;border-radius:50%;
+  border:1px solid rgba(184,59,43,.28);opacity:0;pointer-events:none;
+}
+.tlNode.hot::after{animation:pulse 2.8s ease-out infinite}
+@keyframes pulse{0%{opacity:.6;transform:scale(.85)}70%{opacity:0;transform:scale(1.35)}100%{opacity:0}}
+.tlNode:hover{transform:scale(1.06)}
+.tlNode.act{transform:scale(1.16)}
+.tlNode.act .ring{background:var(--chili);border-color:var(--chili);box-shadow:0 6px 18px rgba(184,59,43,.42)}
+.tlNode.act .num{color:#fdf7e9}
+.tlNode.act .lb{opacity:0}
+
+.tlPanel{
+  position:absolute;width:376px;z-index:22;
+  padding:18px 24px 20px;border-radius:4px;
+  background:rgba(253,248,236,.90);
+  border:1px solid rgba(96,74,46,.18);
+  box-shadow:0 12px 32px rgba(88,58,24,.15);
+  backdrop-filter:blur(4px);
+  opacity:0;transform:translateY(8px) scale(.985);
+  transition:opacity .42s ease,transform .5s var(--ease);
+  pointer-events:none;
+}
+.tlPanel.show{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
+.tlPanel .yr{font-family:var(--serif);font-size:15px;letter-spacing:.3em;color:var(--chili);opacity:.92}
+.tlPanel .hd{font-family:var(--serif);font-size:27px;letter-spacing:.06em;color:var(--ink);margin:5px 0 9px;line-height:1.3}
+.tlPanel .bd{font-size:17px;line-height:1.92;color:var(--ink2);font-weight:300;letter-spacing:.01em;text-align:justify}
+.tlPanel .stem{position:absolute;width:1px;background:linear-gradient(180deg,rgba(184,59,43,.55),rgba(184,59,43,.05))}
+.tlPanel .stem.b{background:linear-gradient(0deg,rgba(184,59,43,.55),rgba(184,59,43,.05))}
+
+.tlHint{
+  position:absolute;left:50%;bottom:26px;transform:translateX(-50%);z-index:30;
+  font-size:17px;letter-spacing:.3em;color:var(--ink3);font-family:var(--serif);
+  display:flex;align-items:center;gap:12px;opacity:.85;transition:opacity .4s ease;
+}
+.tlHint .ln{width:34px;height:1px;background:rgba(96,74,46,.3)}
+
+/* ============ P8 收尾 ============ */
+#p8 .overline{
+  position:absolute;left:50%;top:96px;transform:translateX(-50%);
+  font-size:18px;letter-spacing:.52em;text-indent:.52em;color:var(--teal);
+  font-family:var(--serif);white-space:nowrap;
+}
+#p8 .h1{
+  position:absolute;left:50%;top:152px;transform:translateX(-50%);
+  font-family:var(--serif);font-weight:700;font-size:112px;letter-spacing:.1em;
+  text-indent:.1em;color:#2b2016;white-space:nowrap;line-height:1;
+  text-shadow:0 2px 0 rgba(255,255,255,.35);
+}
+#p8 .h2{
+  position:absolute;left:50%;top:300px;transform:translateX(-50%);
+  font-family:var(--serif);font-size:64px;letter-spacing:.13em;text-indent:.13em;
+  color:#43301c;white-space:nowrap;line-height:1.2;
+}
+#p8 .hero{
+  position:absolute;left:50%;top:430px;transform:translateX(-50%);
+  width:470px;height:auto;filter:drop-shadow(0 18px 30px rgba(88,58,24,.22));
+}
+#p8.on .hero{animation:heroIn 1s var(--ease) .12s both}
+@keyframes heroIn{from{opacity:0;transform:translate(-50%,26px)}to{opacity:1;transform:translate(-50%,0)}}
+#p8 .quote{
+  position:absolute;left:50%;top:1000px;transform:translateX(-50%);
+  font-size:20px;line-height:2.1;color:var(--ink3);text-align:center;letter-spacing:.12em;
+}
+.p8Btn{
+  position:absolute;left:50%;top:1136px;transform:translateX(-50%);
+  width:308px;filter:drop-shadow(0 7px 14px rgba(120,72,20,.24));
+  transition:transform .26s var(--spring);
+}
+.p8Btn img{display:block;width:100%;height:auto}
+.p8Btn span{
+  position:absolute;inset:0;display:grid;place-items:center;
+  font-family:var(--serif);font-weight:700;font-size:34px;letter-spacing:.18em;
+  text-indent:.18em;color:#241a10;
+}
+.p8Btn:active{transform:translateX(-50%) scale(.95)}
+#p8 .foot{
+  position:absolute;left:50%;bottom:30px;transform:translateX(-50%);
+  font-size:15px;letter-spacing:.3em;color:var(--ink3);opacity:.7;white-space:nowrap;
+}
+#p8 .p8seal{position:absolute;right:64px;top:1010px;width:56px;height:56px;font-size:21px}
+
+/* 横屏提示 */
+.rotate{
+  position:fixed;left:50%;top:14px;transform:translate(-50%,0);z-index:200;
+  padding:9px 18px;border-radius:30px;
+  background:rgba(43,36,28,.82);color:#f6eeda;font-size:13px;letter-spacing:.1em;
+  display:flex;align-items:center;gap:8px;
+  opacity:0;pointer-events:none;transition:opacity .5s ease,transform .5s ease;
+}
+.rotate.show{opacity:1;transform:translate(-50%,0)}
+.rotate svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.6}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.001s!important;transition-duration:.001s!important}
+}
+html.noanim *,html.noanim *::before,html.noanim *::after{
+  animation:none!important;transition:none!important;
+}
+html.noanim .arrowHint{opacity:1!important}
+html.noanim #p1 .cover{opacity:1!important;transform:none!important}
+</style>
+</head>
+<body>
+<div id="veil" aria-hidden="true">
+  <span class="vSeal">蘭</span>
+  <span class="vName">兰州牛肉面</span>
+  <span class="vTip">正在拉面</span>
+  <i class="vLine"><b></b></i>
+</div>
+<div id="bg"></div>
+
+<!-- ================= 竖屏舞台 ================= -->
+<div class="stage" id="stageP">
+  <!-- P1 -->
+  <section class="page" id="p1">
+    <img class="cover" src="assets/cover.webp" alt="兰州牛肉面 一碗属于甘肃的传承">
+    <img class="coverJump" src="assets/cover.webp" alt="" aria-hidden="true">
+    <div class="startWrap">
+      <button class="startBtn" id="startBtn" aria-label="开始制作">
+        <img src="assets/titlebox.webp" alt="">
+        <span>开始制作</span>
+      </button>
+    </div>
+    <div class="arrowHint" aria-hidden="true">
+      <svg viewBox="0 0 46 46">
+        <path d="M13 16 L23 26 L33 16"/>
+        <path d="M13 25 L23 35 L33 25"/>
+      </svg>
+    </div>
+    <div class="dots" data-dots></div>
+  </section>
+
+  <!-- P8 -->
+  <section class="page" id="p8">
+    <div class="overline">一 清 · 二 白 · 三 红 · 四 绿 · 五 黄</div>
+    <div class="h1">来兰州</div>
+    <div class="h2">吃一碗现拉的面</div>
+    <img class="hero" src="assets/hero_noodle.webp" alt="刚拉好的牛肉面">
+    <div class="quote">汤要清到透亮，面要黄到筋道<br>这一碗，从嘉庆年间一直热到现在</div>
+    <button class="p8Btn" id="resetBtn" aria-label="返回首页，重新开始">
+      <img src="assets/titlebox.webp" alt="">
+      <span>再拉一碗</span>
+    </button>
+    <i class="seal p8seal">黄河</i>
+    <div class="foot">轻触「再拉一碗」· 回到开篇</div>
+    <div class="dots" data-dots></div>
+  </section>
+</div>
+
+<!-- ================= 横屏舞台 ================= -->
+<div class="stage" id="stageL">
+  <!-- P2 -->
+  <section class="page" id="p2">
+    <div class="lpHead">
+      <span class="tagL">壹 · 十二面型</span>
+      <img class="sign" src="assets/sign.webp" alt="面大面小您说了算">
+      <span class="tagR">已 翻 <b id="c2">0</b> / 6</span>
+    </div>
+    <div class="sideCol l"><span class="v">一清·二白·三红·四绿·五黄</span></div>
+    <div class="sideCol r"><span class="v">轻触木牌·翻看背面</span></div>
+    <div class="grid" id="grid2"></div>
+    <button class="nextBtn" data-next="3">下一屏
+      <svg viewBox="0 0 19 12"><path d="M1 6h16M12 1l5 5-5 5"/></svg>
+    </button>
+    <div class="dots" data-dots></div>
+  </section>
+
+  <!-- P3 -->
+  <section class="page" id="p3">
+    <div class="lpHead">
+      <span class="tagL">贰 · 粗细宽窄</span>
+      <img class="sign" src="assets/sign.webp" alt="面大面小您说了算">
+      <span class="tagR">已 翻 <b id="c3">0</b> / 6</span>
+    </div>
+    <div class="sideCol l"><span class="v">一根面·十二种脾气·任你挑</span></div>
+    <div class="sideCol r"><span class="v">轻触木牌·翻看背面</span></div>
+    <div class="grid" id="grid3"></div>
+    <button class="nextBtn" data-next="4">下一屏
+      <svg viewBox="0 0 19 12"><path d="M1 6h16M12 1l5 5-5 5"/></svg>
+    </button>
+    <div class="dots" data-dots></div>
+  </section>
+
+  <!-- P4 -->
+  <section class="page" id="p4">
+    <div class="p4Top">
+      <div class="t">把它端起来</div>
+      <div class="s">拖 拽 食 材 入 碗</div>
+    </div>
+    <div class="bowlArea" id="bowlArea">
+      <div class="steam" aria-hidden="true">
+        <i class="wisp" style="left:26px;animation-delay:0s"></i>
+        <i class="wisp" style="left:76px;bottom:18px;animation-delay:.8s"></i>
+        <i class="wisp" style="left:128px;animation-delay:1.5s"></i>
+        <i class="wisp" style="left:178px;bottom:22px;animation-delay:.4s"></i>
+        <i class="wisp" style="left:228px;animation-delay:2s"></i>
+      </div>
+      <img class="bowl" src="assets/bowl_empty.webp" alt="一只空的白瓷碗">
+      <i class="bowlShade" aria-hidden="true"></i>
+      <i class="target" aria-hidden="true"></i>
+      <img class="full" src="assets/bowl_full.webp" alt="一碗完整的牛肉面">
+    </div>
+    <div class="tray" id="tray"></div>
+    <div class="toast" id="toast">你的专属面做好了</div>
+    <button class="nextBtn" data-next="5">看这碗面的故事
+      <svg viewBox="0 0 19 12"><path d="M1 6h16M12 1l5 5-5 5"/></svg>
+    </button>
+    <div class="dots" data-dots></div>
+  </section>
+
+  <!-- P5 时间轴（横滑三屏） -->
+  <section class="page" id="p5">
+    <div class="tlTop">
+      <div class="k">贰 · 百 年 面 史</div>
+      <div class="t">一根面的百年</div>
+    </div>
+    <i class="seal tlSeal">兰州</i>
+    <div class="tlViewport" id="tlViewport">
+      <div class="tlTrack" id="tlTrack"></div>
+    </div>
+    <div class="tlHint" id="tlHint">
+      <span class="ln"></span>左右滑动 浏览整根面<span class="ln"></span>
+    </div>
+    <button class="nextBtn" id="tlNext" style="display:none">收尾
+      <svg viewBox="0 0 19 12"><path d="M1 6h16M12 1l5 5-5 5"/></svg>
+    </button>
+    <div class="dots" data-dots></div>
+  </section>
+</div>
+
+<div class="rotate" id="rotate">
+  <svg viewBox="0 0 24 24"><path d="M4 8h10a5 5 0 0 1 0 10H8"/><path d="M8 4L4 8l4 4"/></svg>
+  横过手机，这一屏更好看
+</div>
+
+<script src="assets/timeline.js"></script>
+<script>
+/* =====================================================================
+   数据
+   ===================================================================== */
+const NOODLES = [
+  {n:'毛细', r:'温柔', a:'细若银丝，人称一窝丝。', b:'绵软即化，最考师傅功底。'},
+  {n:'细',   r:'随和', a:'圆润匀称，比毛细略粗。', b:'柔中微弹，最会挂汤。'},
+  {n:'三细', r:'热情', a:'粗细居中，线条圆畅。', b:'不软不硬，口感最均衡。'},
+  {n:'二细', r:'阳刚', a:'面条较粗，根根分明。', b:'咬合有劲，久泡不烂。'},
+  {n:'二柱子',r:'开朗', a:'粗如筷子，形似蜡笔。', b:'极费牙，却最扎实顶饱。'},
+  {n:'韭叶', r:'平静', a:'压成扁平，宽窄如韭叶。', b:'边薄心厚，一吸满口香。'},
+  {n:'薄宽', r:'稳重', a:'形似海带，两边极薄。', b:'柔软易吸汤，最不费牙。'},
+  {n:'宽',   r:'豪放', a:'面片宽阔，类北方拉条子。', b:'柔韧厚实，裹汤最过瘾。'},
+  {n:'大宽', r:'威猛', a:'形如裤带，一根铺满碗。', b:'厚实筋道，尽显西北豪迈。'},
+  {n:'荞麦棱',r:'奔放', a:'白面拉成三棱，形似荞麦。', b:'外硬内软，嚼劲独特。'},
+  {n:'空心面',r:'耿直', a:'面条中空，几近绝迹。', b:'吸汤极佳，咬下满口惊喜。'},
+  {n:'五道丝面',r:'乐观',a:'表面压出五道棱丝。', b:'寓五十六族相连，国泰民安。'}
+];
+
+const HIST = [
+  {yr:'清 嘉 庆', hd:'一担汤面过黄河',
+   d:'东乡族马六七把"小车牛肉老汤面"的技艺带进兰州。他在国子监结识同窗陈维精，得授秘方，带回中原的熬汤老方与手工揉面的底子。这门手艺跨过黄河落户兰州，就此埋下百年风味的伏笔。',
+   pos:'above'},
+  {yr:'1 9 5 6', hd:'兰清阁与师带徒',
+   d:'面馆公私合营，转为国营"兰清阁"。此后二十余年，国营体系以"师带徒"批量培养技师——工艺虽无飞跃，却把原本属于"马家字号"的私技，变成了兰州共有的技术存量。',
+   pos:'below'},
+  {yr:'1 9 7 8 后', hd:'个体复苏与名称错位',
+   d:'自由市场放开，马子禄、马有布等首批个体品牌开张。与此同时，青海化隆人打出"兰州拉面"的招牌走向全国：一个坚守本土的"牛大"，一个外出谋生的"拉面"。',
+   pos:'above'},
+  {yr:'2 0 2 1', hd:'入选国家级非遗',
+   d:'制作技艺入选国家级非遗名录。认定的是"拉制"这个动作——手工揉面、抻拉、出条。机器能压出标准粗细，却复刻不了师傅感知面团筋度与温度的那点活态智慧。',
+   pos:'below'},
+  {yr:'2 0 2 6', hd:'千亿产业与法治引领',
+   d:'全产业链产值突破千亿元，门店总量达 8.2 万家。11 月 1 日，《兰州牛肉拉面产业促进条例》正式施行，从"政策推动"转向"法治引领"，守住风味底线，也为出海立起刚性框架。',
+   pos:'above'}
+];
+
+const ITEMS = [
+  {id:'beef',   name:'牛肉片', img:'assets/beef.webp',         w:150, slot:[-74,-42], sc:.70, rot:-9},
+  {id:'radish', name:'白萝卜', img:'assets/radish.webp',        w:164, slot:[ 76,-58], sc:.70, rot:7},
+  {id:'sprout', name:'青蒜苗', img:'assets/sprout.webp',        w:132, slot:[ 92, 48], sc:.62, rot:-5},
+  {id:'noodle', name:'鲜面条', img:'assets/noodle_bundle.webp', w:186, slot:[-86, 54], sc:.58, rot:-4}
+];
+
+/* =====================================================================
+   基础工具
+   ===================================================================== */
+const $  = (s,r=document)=>r.querySelector(s);
+const $$ = (s,r=document)=>[...r.querySelectorAll(s)];
+const stageP = $('#stageP'), stageL = $('#stageL');
+const BOWL = {x:667, y:400, rx:196, ry:164};
+
+function fitStages(){
+  const vw = innerWidth, vh = innerHeight;
+  const kp = Math.min(vw/750, vh/1334);
+  stageP.style.transform = `translate(-50%,-50%) scale(${kp})`;
+  const kl = Math.min(vw/1334, vh/750) * (vh > vw ? .94 : .985);
+  stageL.style.transform = `translate(-50%,-50%) scale(${kl})`;
+  document.body.classList.toggle('landscapeNow', vh > vw);
+}
+
+/* =====================================================================
+   页面流转
+   ===================================================================== */
+const state = { page:0, tlIdx:0, activeNode:null, busy:false };
+
+function stageOf(n){ return (n===1||n===8) ? stageP : stageL; }
+
+function go(n){
+  if(state.busy || n === state.page) return;
+  state.busy = true;
+
+  const cur = $('.page.on');
+  if(cur){ cur.classList.remove('slow'); cur.classList.remove('on'); }
+
+  setTimeout(()=>{
+    const nx = $('#p'+n);
+    const st = stageOf(n);
+    stageP.classList.toggle('live', st===stageP);
+    stageL.classList.toggle('live', st===stageL);
+
+    if(n===5){ state.tlIdx = 0; syncTimeline(true); }
+    if(n===2 || n===3) refreshFocus(n);
+    // 重回封面时清掉上次动画的收尾标记，让「颠三下」能再演一次
+    if(n===1) $$('#p1 .hopDone').forEach(el=>el.classList.remove('hopDone'));
+
+    nx.classList.add('slow');
+    // 强制回流，保证过渡生效
+    void nx.offsetWidth;
+    nx.classList.add('on');
+    state.page = n;
+    paintDots();
+    if(n>=2 && n<=5) maybeRotateHint();
+    setTimeout(()=>{ state.busy = false; }, 680);
+  }, 250);
+}
+
+function paintDots(){
+  let cur = state.page;
+  if(cur === 5) cur = 5 + state.tlIdx;
+  $$('[data-dots]').forEach(box=>{
+    if(!box.children.length){
+      for(let i=0;i<8;i++){
+        const d = document.createElement('i');
+        d.className = 'dot';
+        box.appendChild(d);
+      }
+    }
+    [...box.children].forEach((d,i)=>d.classList.toggle('on', i+1 === cur));
+  });
+}
+
+/* 横屏页提示 */
+let rotTimer;
+function maybeRotateHint(){
+  const el = $('#rotate');
+  if(innerHeight <= innerWidth){ el.classList.remove('show'); return; }
+  el.classList.add('show');
+  clearTimeout(rotTimer);
+  rotTimer = setTimeout(()=>el.classList.remove('show'), 4600);
+}
+
+/* 视口变化：手机地址栏收放、横竖屏切换、桌面拖窗口都走这里 */
+let fitTimer;
+function refit(){
+  clearTimeout(fitTimer);
+  fitTimer = setTimeout(()=>{
+    fitStages();
+    // 舞台缩放变了，时间轴的像素位移要跟着归一化，否则翻页会错位
+    if(state.page === 5){
+      setTrackX(-state.tlIdx * 1334, true);
+    }
+    if(state.page >= 2 && state.page <= 5) maybeRotateHint();
+  }, 90);
+}
+addEventListener('resize', refit);
+addEventListener('orientationchange', refit);
+if(window.visualViewport) visualViewport.addEventListener('resize', refit);
+
+/* =====================================================================
+   P1 / P8
+   ===================================================================== */
+$('#startBtn').addEventListener('click', ()=>{
+  lockLandscape();
+  go(2);
+});
+
+/* 手机端尽量锁定横屏（需用户手势触发，失败则退回横屏提示） */
+async function lockLandscape(){
+  if(!matchMedia('(pointer:coarse)').matches) return;
+  if(Math.min(innerWidth, innerHeight) > 820) return;   // 触屏笔记本不强行全屏
+  try{
+    if(!document.fullscreenElement && document.documentElement.requestFullscreen){
+      await document.documentElement.requestFullscreen({navigationUI:'hide'});
+    }
+  }catch(_){}
+  try{
+    if(screen.orientation && screen.orientation.lock){
+      await screen.orientation.lock('landscape');
+    }
+  }catch(_){}
+}
+$('#resetBtn').addEventListener('click', ()=>{
+  resetAll();
+  state.page = 0;
+  go(1);
+});
+
+function resetAll(){
+  // 翻牌复位
+  $$('.card').forEach(c=>{
+    c.classList.remove('turn','focus','turned');
+    c.querySelector('.inner').style.transform = 'rotateY(0deg)';
+    c.dataset.deg = 0;
+  });
+  flipCount = {2:0, 3:0};
+  $('#c2').textContent = '0'; $('#c3').textContent = '0';
+  // 食材复位
+  placedSet.clear();                      // 关键：不清空会导致二次游玩时第一次落料就误判「已满碗」
+  $$('.chip').forEach(ch=>{
+    ch.classList.remove('placed','ghost','gone','dragging');
+    ch.dataset.placed = '';
+    ch.style.transition = 'none';
+    ch.style.opacity = '';                // 清掉成品动画留下的 inline opacity
+    ch.style.pointerEvents = '';
+    ch.style.zIndex = '';
+    ch.style.transformOrigin = '';
+    ch.style.transform = '';
+    ch.style.left = ch.dataset.ox + 'px';
+    ch.style.top  = ch.dataset.oy + 'px';
+    void ch.offsetWidth;
+    ch.style.transition = '';
+  });
+  $$('.ripple').forEach(r=>r.remove());
+  $('#bowlArea').classList.remove('done');
+  $('#toast').classList.remove('show');
+  // 时间轴
+  state.tlIdx = 0; state.activeNode = null;
+  $$('.tlNode').forEach(n=>n.classList.remove('act','hot'));
+  $$('.tlPanel').forEach(p=>p.classList.remove('show'));
+  const sg = $('.tlSvg'); if(sg) sg.classList.remove('dyeing');
+  syncTimeline(true);
+}
+
+/* =====================================================================
+   P2 / P3  面型翻牌
+   ===================================================================== */
+let flipCount = {2:0, 3:0};
+
+function buildGrid(pid, list, offset){
+  const g = $('#grid'+pid);
+  g.innerHTML = '';
+  list.forEach((nd, i)=>{
+    const idx = offset + i;
+    const card = document.createElement('button');
+    card.className = 'card';
+    card.dataset.deg = 0;
+    card.dataset.pid = pid;
+    card.dataset.idx = idx;
+    card.setAttribute('aria-label', nd.n + '，寓意' + nd.r + '，轻触翻看');
+    card.innerHTML = `
+      <div class="lift">
+        <div class="inner">
+          <div class="face front"><img src="assets/plaque_${nd.n}.webp" alt=""></div>
+          <div class="face back">
+            <img src="assets/plaque_blank.webp" alt="">
+            <div class="vtxt"><b>${nd.a}</b>${nd.b}</div>
+            <i class="seal seal2">${nd.r}</i>
+          </div>
+        </div>
+      </div>`;
+    g.appendChild(card);
+  });
+}
+
+function onCardTap(card){
+  const pid = card.dataset.pid;
+  const inner = card.querySelector('.inner');
+  const cur = Number(card.dataset.deg) || 0;
+  const deg = cur + 180;                 // 每次点击继续同向旋转，累计 360°
+  card.dataset.deg = deg;
+  inner.style.transform = `rotateY(${deg}deg)`;
+
+  const nowTurned = (deg % 360) !== 0;
+  card.classList.toggle('turned', nowTurned);
+
+  // 计数
+  const turnedCount = $$('.card', $('#grid'+pid)).filter(c=>c.classList.contains('turned')).length;
+  if(turnedCount !== flipCount[pid]){
+    flipCount[pid] = turnedCount;
+    $('#c'+pid).textContent = turnedCount;
+  }
+
+  // 焦点：放大当前翻开的这张
+  $$('.card').forEach(c=>c.classList.remove('focus'));
+  if(nowTurned){
+    card.classList.add('focus');
+    $('#grid'+pid).classList.add('hasFocus');
+    // 翻牌结束后的 0.2s 轻微回弹
+    setTimeout(()=>{
+      card.animate(
+        [{transform:'scale(1)'},{transform:'scale(1.035)'},{transform:'scale(1)'}],
+        {duration:230, easing:'cubic-bezier(.3,.9,.4,1)'}
+      );
+    }, 900);
+  }else{
+    setTimeout(()=>{
+      card.animate(
+        [{transform:'scale(1)'},{transform:'scale(1.025)'},{transform:'scale(1)'}],
+        {duration:220, easing:'cubic-bezier(.3,.9,.4,1)'}
+      );
+    }, 900);
+  }
+  refreshFocus(pid);
+}
+
+function refreshFocus(pid){
+  const g = $('#grid'+pid);
+  if(!g) return;
+  g.classList.toggle('hasFocus', !!g.querySelector('.card.focus'));
+}
+
+document.addEventListener('click', (e)=>{
+  const card = e.target.closest('.card');
+  if(card){ onCardTap(card); return; }
+  const next = e.target.closest('[data-next]');
+  if(next){ go(Number(next.dataset.next)); }
+});
+
+/* =====================================================================
+   P4  拖拽成面
+   ===================================================================== */
+const tray = $('#tray');
+const bowlArea = $('#bowlArea');
+const placedSet = new Set();
+
+function buildTray(){
+  tray.innerHTML = '';
+  const pos = [ {x:126,y:196}, {x:118,y:474}, {x:1078,y:186}, {x:1070,y:466} ];
+  ITEMS.forEach((it, i)=>{
+    const el = document.createElement('div');
+    el.className = 'chip';
+    el.dataset.id = it.id;
+    el.dataset.ox = pos[i].x;
+    el.dataset.oy = pos[i].y;
+    el.style.left = pos[i].x + 'px';
+    el.style.top  = pos[i].y + 'px';
+    el.innerHTML = `<img src="${it.img}" style="width:${it.w}px" alt=""><span class="cap">${it.name}</span>`;
+    tray.appendChild(el);
+    attachDrag(el, it);
+  });
+}
+
+function attachDrag(el, it){
+  let sx=0, sy=0, ox=0, oy=0, pid=null, dragging=false, moved=false;
+
+  const onMove = (e)=>{
+    if(!dragging || (pid !== null && e.pointerId !== pid)) return;
+    if(e.cancelable) e.preventDefault();
+    const p = toStage(e);
+    const dx = p.x - sx, dy = p.y - sy;
+    if(Math.abs(dx) > 3 || Math.abs(dy) > 3) moved = true;
+    el.style.transform = `translate(${dx}px,${dy}px) rotate(${it.rot * 0.4}deg) scale(1.04)`;
+  };
+
+  const unbind = ()=>{
+    window.removeEventListener('pointermove', onMove);
+    window.removeEventListener('pointerup', onUp);
+    window.removeEventListener('pointercancel', onUp);
+  };
+
+  const onUp = (e)=>{
+    if(!dragging) return;
+    if(pid !== null && e.pointerId !== pid) return;
+    dragging = false; pid = null;
+    unbind();
+    el.classList.remove('dragging');
+    el.style.zIndex = '';
+
+    const p = toStage(e);
+    const dx = p.x - sx, dy = p.y - sy;
+
+    // 逻辑坐标计算中心（不受 transform 过渡影响）
+    const w = el.offsetWidth, h = el.offsetHeight;
+    const cx = ox + dx + w / 2;
+    const cy = oy + dy + h / 2;
+
+    // 是否落在碗口范围内（含 10px 容差）
+    const ex = (cx - BOWL.x) / (BOWL.rx + 10);
+    const ey = (cy - BOWL.y) / (BOWL.ry + 10);
+    if(moved && ex*ex + ey*ey <= 1){
+      place(el, it);
+    }else{
+      // 没进碗：老老实实滑回原位，不留下任何偏移
+      el.style.transition = 'transform .42s cubic-bezier(.3,1.25,.55,1)';
+      el.style.transform = '';
+      setTimeout(()=>{
+        if(!el.classList.contains('placed') && !el.classList.contains('dragging')){
+          el.style.transition = '';
+          el.style.transformOrigin = '';
+        }
+      }, 470);
+    }
+  };
+
+  el.addEventListener('pointerdown', (e)=>{
+    if(el.classList.contains('placed') || el.classList.contains('gone')) return;
+    if(e.button !== undefined && e.button > 0) return;
+    e.preventDefault();
+
+    // 把当前位置「焊」到 left/top 上，再清掉残留 transform：
+    // 反复拖拽时位移不会逐次累积，素材不会越拖越偏、最后跑出画面
+    const lx = parseFloat(el.style.left), ly = parseFloat(el.style.top);
+    ox = Number.isFinite(lx) ? lx : el.offsetLeft;
+    oy = Number.isFinite(ly) ? ly : el.offsetTop;
+    el.style.transition = 'none';
+    el.style.left = ox + 'px';
+    el.style.top  = oy + 'px';
+    el.style.transformOrigin = '';
+    el.style.transform = '';
+    void el.offsetWidth;
+
+    const p = toStage(e);
+    sx = p.x; sy = p.y;
+    dragging = true; moved = false; pid = e.pointerId;
+    el.classList.add('dragging');
+    el.style.zIndex = 40;
+
+    try{ el.setPointerCapture(e.pointerId); }catch(_){}
+    // 兜底：指针捕获在部分环境会失败，窗口级监听保证一定能收尾
+    window.addEventListener('pointermove', onMove, {passive:false});
+    window.addEventListener('pointerup', onUp);
+    window.addEventListener('pointercancel', onUp);
+  });
+}
+
+function dist(x,y){ return Math.hypot(x-BOWL.x, y-BOWL.y); }
+
+function toStage(e){
+  const st = stageL.getBoundingClientRect();
+  const k = st.width / 1334;
+  return { x:(e.clientX - st.left)/k, y:(e.clientY - st.top)/k };
+}
+
+function place(el, it){
+  const img = el.querySelector('img');
+  // 用自然宽高比推尺寸：图片尚未解码也不会算出 0 高，落位永远准确
+  const nw = img.naturalWidth || it.w;
+  const nh = img.naturalHeight || Math.round(it.w * 0.8);
+  const w = it.w;
+  const h = Math.round(w * nh / nw);
+  const targetLeft = BOWL.x + it.slot[0] - w/2;
+  const targetTop  = BOWL.y + it.slot[1] - h/2;
+
+  el.classList.remove('dragging');
+  el.classList.add('placed');
+  el.dataset.placed = '1';
+
+  // 复位到槽位（用 left/top 直接定位，避免与 translate 混用）
+  el.style.transition = 'left .5s cubic-bezier(.3,1.3,.55,1), top .5s cubic-bezier(.3,1.3,.55,1), transform .5s cubic-bezier(.3,1.3,.55,1), opacity .35s ease';
+  el.style.transform = '';
+  requestAnimationFrame(()=>{
+    el.style.left = targetLeft + 'px';
+    el.style.top  = targetTop  + 'px';
+    el.style.transformOrigin = '50% 50%';
+    el.style.transform = `rotate(${it.rot}deg) scale(${it.sc})`;
+  });
+  setTimeout(()=>{ el.style.transition = ''; }, 560);
+
+  // 落汤涟漪
+  const r = document.createElement('i');
+  r.className = 'ripple';
+  const size = 120;
+  r.style.cssText = `left:${BOWL.x+it.slot[0]}px;top:${BOWL.y+it.slot[1]}px;width:${size}px;height:${size}px;z-index:5`;
+  tray.appendChild(r);
+  setTimeout(()=>r.remove(), 800);
+
+  placedSet.add(it.id);
+  if(placedSet.size === ITEMS.length) finishBowl();
+}
+
+function finishBowl(){
+  setTimeout(()=>{
+    bowlArea.classList.add('done');
+    // 用 class 隐藏，复位时一键清掉，不会残留看不见的 inline 样式
+    $$('.chip.placed').forEach(c=> c.classList.add('gone'));
+    setTimeout(()=>{ $('#toast').classList.add('show'); }, 900);
+  }, 200);
+  placedSet.clear();
+}
+
+/* =====================================================================
+   P5  时间轴
+   ===================================================================== */
+const TL = window.TL;
+let tlBuilt = false;
+
+function buildTimeline(){
+  if(tlBuilt) return;
+  tlBuilt = true;
+  const track = $('#tlTrack');
+  track.style.width = TL.canvasW + 'px';
+
+  const NS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(NS,'svg');
+  svg.setAttribute('class','tlSvg');
+  svg.setAttribute('width', TL.canvasW);
+  svg.setAttribute('height', TL.canvasH);
+  svg.setAttribute('viewBox', `0 0 ${TL.canvasW} ${TL.canvasH}`);
+
+  // 红色浸染高亮（用 mask 只显示某一段，保留面条肌理）
+  const defs = document.createElementNS(NS,'defs');
+  defs.innerHTML = `
+    <filter id="dyeRed" x="-6%" y="-30%" width="112%" height="160%"
+            color-interpolation-filters="sRGB">
+      <feColorMatrix type="matrix" values="
+        0.34 0.66 0.13 0 -0.030
+        0.14 0.28 0.06 0 -0.018
+        0.10 0.19 0.04 0 -0.014
+        0 0 0 1 0"/>
+    </filter>
+    <mask id="segMask" maskUnits="userSpaceOnUse" x="0" y="0"
+          width="${TL.canvasW}" height="${TL.canvasH}">
+      <rect x="0" y="0" width="${TL.canvasW}" height="${TL.canvasH}" fill="#000"/>
+      <path id="segPath" fill="none" stroke="#fff" stroke-width="124"
+            stroke-linecap="round" pathLength="1000"
+            stroke-dasharray="0 1200" stroke-dashoffset="0"
+            d="${TL.path}"/>
+    </mask>`;
+  svg.appendChild(defs);
+
+  // 面条本体（用户素材，沿设计曲线重映射）
+  const rib = TL.ribbon;
+  const img = document.createElementNS(NS,'image');
+  img.setAttribute('href','assets/noodle_ribbon.webp');
+  img.setAttribute('x', rib.x); img.setAttribute('y', rib.y);
+  img.setAttribute('width', rib.w); img.setAttribute('height', rib.h);
+  svg.appendChild(img);
+
+  // 红色段（同一张面，被红色滤镜染色后按 mask 显影）
+  const dye = document.createElementNS(NS,'image');
+  dye.setAttribute('class','dye');
+  dye.setAttribute('href','assets/noodle_ribbon.webp');
+  dye.setAttribute('x', rib.x); dye.setAttribute('y', rib.y);
+  dye.setAttribute('width', rib.w); dye.setAttribute('height', rib.h);
+  dye.setAttribute('mask','url(#segMask)');
+  dye.setAttribute('filter','url(#dyeRed)');
+  svg.appendChild(dye);
+  track.appendChild(svg);
+
+  // 节点 + 面板
+  TL.nodes.forEach((nd, i)=>{
+    const data = HIST[i];
+    const btn = document.createElement('button');
+    btn.className = 'tlNode hot';
+    btn.style.left = nd.cx + 'px';
+    btn.style.top  = nd.cy + 'px';
+    btn.dataset.i = i;
+    btn.setAttribute('aria-label', data.yr + ' ' + data.hd);
+    btn.innerHTML = `<span class="ring"></span><span class="num">${i+1}</span>`;
+    btn.addEventListener('click', ()=>openNode(i));
+    track.appendChild(btn);
+
+    const p = document.createElement('div');
+    p.className = 'tlPanel';
+    p.dataset.i = i;
+    p.innerHTML = `<div class="yr">${data.yr}</div><div class="hd">${data.hd}</div>
+      <div class="bd">${data.d}</div><i class="stem"></i>`;
+    track.appendChild(p);
+
+    // 先量高度，再决定摆在上方还是下方（都不压面条、不压标题）
+    const GAP = 30, TOPLIM = 126, BOTLIM = TL.canvasH - 34;
+    const left = Math.max(10, Math.min(TL.canvasW - 386, nd.cx - 188));
+    p.style.left = left + 'px';
+    p.style.top = '0px';
+    const hgt = p.offsetHeight;
+    const upTop  = nd.top - GAP - hgt;
+    const dnTop  = nd.bot + GAP;
+    const okUp   = upTop >= TOPLIM;
+    const okDn   = dnTop + hgt <= BOTLIM;
+    let above;
+    if(okUp && okDn) above = (nd.top - TOPLIM) > (BOTLIM - nd.bot);
+    else if(okUp) above = true;
+    else if(okDn) above = false;
+    else above = upTop > TOPLIM * 2 - hgt;
+
+    if(above){
+      p.style.top = Math.max(TOPLIM, upTop) + 'px';
+      const stem = p.querySelector('.stem');
+      stem.classList.add('b');           // 从面板底部向下连到面条
+      stem.style.cssText = `left:${nd.cx - left}px;top:100%;height:${GAP - 6}px`;
+    }else{
+      p.style.top = Math.min(BOTLIM - hgt, dnTop) + 'px';
+      const stem = p.querySelector('.stem');
+      stem.style.cssText = `left:${nd.cx - left}px;bottom:100%;height:${GAP - 6}px`;
+      stem.classList.remove('b');
+    }
+    p.dataset.above = above ? '1' : '0';
+  });
+
+  setTimeout(()=>{ if(state.page===5 && state.activeNode===null) openNode(0, true); }, 700);
+}
+
+function openNode(i, silent){
+  const nodes = $$('.tlNode');
+  const panels = $$('.tlPanel');
+  const svg = $('.tlSvg');
+  if(state.activeNode === i && !silent){
+    state.activeNode = null;
+    nodes[i].classList.remove('act');
+    nodes.forEach(n=>n.classList.add('hot'));
+    panels[i].classList.remove('show');
+    svg.classList.remove('dyeing');
+    return;
+  }
+  state.activeNode = i;
+  nodes.forEach((n,k)=>{
+    n.classList.toggle('act', k===i);
+    n.classList.toggle('hot', k!==i);
+  });
+  panels.forEach((p,k)=>p.classList.toggle('show', k===i));
+
+  // 高亮「该节点所在面段」= 上一节点与下一节点的中点之间
+  const us = TL.nodes.map(n=>n.u);
+  const start = i === 0 ? 4 : (us[i-1] + us[i]) / 2;
+  const end   = i === us.length-1 ? 1000 : (us[i] + us[i+1]) / 2;
+  const len = Math.max(26, end - start);
+  const sp = $('#segPath');
+  sp.setAttribute('stroke-dasharray', `${len} 1200`);
+  sp.setAttribute('stroke-dashoffset', `${-start}`);
+  svg.classList.add('dyeing');
+
+  // 确保节点在可视区域内
+  const need = TL.nodes[i].cx;
+  const target = Math.max(-(TL.canvasW - 1334), Math.min(0, 667 - need));
+  if(Math.abs(target - currentX) > 40){
+    setTrackX(target, true);
+    state.tlIdx = Math.round(-target / 1334);
+    paintDots();
+    updateTlNext();
+  }
+}
+
+/* 横向拖拽 */
+let currentX = 0, dragging = false, startX = 0, startTrack = 0, lastX = 0, vx = 0, lastT = 0;
+const viewport = $('#tlViewport'), track = $('#tlTrack');
+
+function setTrackX(x, animate){
+  const min = -(TL.canvasW - 1334);
+  currentX = Math.max(min, Math.min(0, x));
+  track.classList.toggle('anim', !!animate);
+  track.style.transform = `translateX(${currentX}px)`;
+  if(animate) setTimeout(()=>track.classList.remove('anim'), 560);
+}
+
+function updateTlNext(){
+  const btn = $('#tlNext');
+  btn.style.display = state.tlIdx >= 2 ? 'flex' : 'none';
+  $('#tlHint').style.opacity = state.tlIdx >= 2 ? '0' : '.85';
+}
+
+function syncTimeline(instant){
+  state.tlIdx = 0;
+  setTrackX(0, !instant);
+  updateTlNext();
+}
+
+viewport.addEventListener('pointerdown', (e)=>{
+  if(e.target.closest('.tlNode') || e.target.closest('.tlPanel')) return;
+  dragging = true; startX = e.clientX; startTrack = currentX;
+  lastX = e.clientX; vx = 0; lastT = performance.now();
+  track.classList.remove('anim');
+  viewport.classList.add('drag');
+  try{ viewport.setPointerCapture(e.pointerId); }catch(_){}
+});
+viewport.addEventListener('pointermove', (e)=>{
+  if(!dragging) return;
+  const dx = e.clientX - startX;
+  const st = stageL.getBoundingClientRect();
+  const k = st.width / 1334;
+  setTrackX(startTrack + dx / k, false);
+  const now = performance.now();
+  const dt = Math.max(1, now - lastT);
+  vx = (e.clientX - lastX) / dt;
+  lastX = e.clientX; lastT = now;
+});
+const endDrag = ()=>{
+  if(!dragging) return;
+  dragging = false;
+  viewport.classList.remove('drag');
+  const st = stageL.getBoundingClientRect();
+  const k = st.width / 1334;
+  const projected = currentX + (vx * 240) / k;
+  let idx = Math.round(-projected / 1334);
+  idx = Math.max(0, Math.min(2, idx));
+  setTrackX(-idx * 1334, true);
+  state.tlIdx = idx;
+  paintDots();
+  updateTlNext();
+};
+viewport.addEventListener('pointerup', endDrag);
+viewport.addEventListener('pointercancel', endDrag);
+
+/* 桌面端滚轮 / 触控板：横向翻时间轴（一次一格，带节流） */
+let wheelLock = 0, wheelAcc = 0;
+viewport.addEventListener('wheel', (e)=>{
+  if(state.page !== 5) return;
+  e.preventDefault();
+  const now = performance.now();
+  const d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+  if(now < wheelLock){ wheelAcc = 0; return; }
+  wheelAcc += d;
+  if(Math.abs(wheelAcc) < 16) return;
+  const dir = wheelAcc > 0 ? 1 : -1;
+  wheelAcc = 0;
+  const idx = Math.max(0, Math.min(2, state.tlIdx + dir));
+  if(idx === state.tlIdx){
+    if(dir === 1) go(8);              // 已在末屏继续后滚 → 收尾
+    return;
+  }
+  state.tlIdx = idx;
+  setTrackX(-idx * 1334, true);
+  paintDots();
+  updateTlNext();
+  wheelLock = now + 460;
+}, {passive:false});
+
+$('#tlNext').addEventListener('click', ()=>go(8));
+
+/* =====================================================================
+   键盘（方便桌面预览）
+   ===================================================================== */
+addEventListener('keydown', (e)=>{
+  if(e.key === 'ArrowRight'){
+    if(state.page === 5){
+      if(state.tlIdx < 2){
+        state.tlIdx++; setTrackX(-state.tlIdx*1334, true); paintDots(); updateTlNext();
+      }else go(8);
+    }else if(state.page && state.page < 8){ go(state.page + 1); }
+  }
+  if(e.key === 'ArrowLeft'){
+    if(state.page === 5 && state.tlIdx > 0){
+      state.tlIdx--; setTrackX(-state.tlIdx*1334, true); paintDots(); updateTlNext();
+    }else if(state.page > 1){ go(state.page - 1); }
+  }
+});
+
+/* =====================================================================
+   自检（?t=1 时在标题栏输出各交互结果，便于自动化核验）
+   ===================================================================== */
+function runTest(){
+  const R = [];
+  const ok = (k, v)=>R.push(k + '=' + (v ? 'OK' : 'FAIL'));
+  const sleep = ms=> new Promise(r=>setTimeout(r, ms));
+
+  (async ()=>{
+    // 1) 翻牌
+    const c0 = $$('#grid2 .card')[0];
+    c0.click();
+    ok('flip1', c0.classList.contains('turned') && c0.querySelector('.inner').style.transform.includes('180'));
+    c0.click();
+    ok('flip360', !c0.classList.contains('turned') &&
+       c0.querySelector('.inner').style.transform.includes('360'));
+    ok('gridIsolated', $$('#grid3 .card.turned').length === 0 && $('#c3').textContent === '0');
+
+    // 2) 拖拽吸附（合成指针事件）
+    const chip = $('.chip[data-id="beef"]');
+    const st = stageL.getBoundingClientRect();
+    const k = st.width / 1334;
+    const from = { x: st.left + 180 * k, y: st.top + 240 * k };
+    const to   = { x: st.left + BOWL.x * k, y: st.top + BOWL.y * k };
+    const ev = (type, p)=> new PointerEvent(type, {clientX:p.x, clientY:p.y, bubbles:true, pointerId:1, isPrimary:true});
+    chip.dispatchEvent(ev('pointerdown', from));
+    chip.dispatchEvent(ev('pointermove', {x:(from.x+to.x)/2, y:(from.y+to.y)/2}));
+    chip.dispatchEvent(ev('pointermove', to));
+    chip.dispatchEvent(ev('pointerup', to));
+    ok('snap', chip.classList.contains('placed'));
+    // 拖到碗外应当回位
+    const c2 = $('.chip[data-id="radish"]');
+    c2.dispatchEvent(ev('pointerdown', from));
+    c2.dispatchEvent(ev('pointermove', {x:from.x + 220*k, y:from.y}));
+    c2.dispatchEvent(ev('pointerup', {x:from.x + 220*k, y:from.y}));
+    ok('noSnapOutside', !c2.classList.contains('placed'));
+    // 拖到碗外后必须原地归位，left/top 不被写坏
+    ok('noDrift', Math.abs(parseFloat(c2.style.left) - Number(c2.dataset.ox)) < 0.6 &&
+       Math.abs(parseFloat(c2.style.top) - Number(c2.dataset.oy)) < 0.6);
+    // 同一块料连拖两次，位置不累积漂移
+    c2.dispatchEvent(ev('pointerdown', from));
+    c2.dispatchEvent(ev('pointermove', {x:from.x + 120*k, y:from.y + 70*k}));
+    c2.dispatchEvent(ev('pointerup', {x:from.x + 120*k, y:from.y + 70*k}));
+    await sleep(240);
+    ok('repeatDrag', Math.abs(parseFloat(c2.style.left) - Number(c2.dataset.ox)) < 0.6 &&
+       Math.abs(parseFloat(c2.style.top) - Number(c2.dataset.oy)) < 0.6 &&
+       !c2.classList.contains('placed'));
+    if(!chip.classList.contains('placed')){
+      const rc = chip.getBoundingClientRect();
+      const cx = (rc.left + rc.width/2 - st.left)/k, cy = (rc.top + rc.height/2 - st.top)/k;
+      R.push('dbg:' + Math.round(cx) + ',' + Math.round(cy) + ',' + Math.round(st.left) + ',' + Math.round(st.top) + ',' + Math.round(k*1000)/1000 + ',' + Math.round(rc.width));
+    }
+
+    // 3) 全部入碗 -> 成品
+    ITEMS.forEach(it=>{
+      const el = $('.chip[data-id="'+it.id+'"]');
+      if(!el.classList.contains('placed')) place(el, it);
+    });
+    await sleep(420);
+    ok('bowlDone', bowlArea.classList.contains('done'));
+    await sleep(950);
+    ok('toast', $('#toast').classList.contains('show'));
+
+    // 4) 时间轴节点
+    openNode(2);
+    ok('nodeSeg', $('#segPath').getAttribute('stroke-dasharray') !== '0 1200');
+    ok('dyeOn', $('.tlSvg').classList.contains('dyeing'));
+    openNode(4);
+    ok('switch', $$('.tlPanel.show').length === 1);
+
+    // 5) 复位
+    resetAll();
+    ok('reset', $$('.card.turned').length === 0 && $$('.chip.placed').length === 0 &&
+       $$('.chip.gone').length === 0 && placedSet.size === 0 &&
+       !$('.tlSvg').classList.contains('dyeing') && state.activeNode === null);
+    // 封面「面碗颠三下」：动画确实被挂上（播放中或已播完并摘掉都算通过）
+    const cj = $('.coverJump'), swm = $('.startWrap');
+    const anC = getComputedStyle(cj).animationName || '';
+    ok('coverHop', cj.classList.contains('hopDone') || anC.indexOf('coverHopY') >= 0);
+    ok('coverHopSync', swm.classList.contains('hopDone') ||
+       (getComputedStyle(swm).animationName || '').indexOf('hopSyncY') >= 0);
+
+    // 6) 复位后能重新完整走一遍（二次游玩不再误判满碗）
+    const r2 = $('.chip[data-id="radish"]');
+    place(r2, ITEMS.find(x=>x.id==='radish'));
+    ok('secondRound', bowlArea.classList.contains('done') === false && placedSet.size === 1);
+
+    document.title = R.join(' | ');
+    document.body.setAttribute('data-test', R.join(' | '));
+  })();
+}
+
+
+/* 点击穿透自检：?hit=1
+   用 elementFromPoint 真实命中测试，逐一验证「看得见的按钮是不是点得到」 */
+function hitProbe(){
+  const pg = $('#p' + state.page) || $('.page.on') || document.body;
+  const targets = $$('button, .card, .chip, .tlNode', pg)
+    .filter(el=>{
+      const r = el.getBoundingClientRect();
+      const cs = getComputedStyle(el);
+      // 只查「在视口内、看得见」的控件，被时间轴平移出屏幕的不算
+      const cx = r.left + r.width/2, cy = r.top + r.height/2;
+      return r.width > 2 && r.height > 2 && cx > 0 && cy > 0 &&
+             cx < innerWidth && cy < innerHeight &&
+             cs.visibility !== 'hidden' && +cs.opacity > .05;
+    });
+  const bad = [];
+  targets.forEach(el=>{
+    const r = el.getBoundingClientRect();
+    // 取按钮中心与四分之一位置，避开圆角/镂空
+    const pts = [[.5,.5],[.3,.5],[.7,.5]];
+    let good = false;
+    for(const [fx,fy] of pts){
+      const n = document.elementFromPoint(r.left + r.width*fx, r.top + r.height*fy);
+      if(n && (el === n || el.contains(n) || n.contains(el))){ good = true; break; }
+    }
+    if(!good){
+      const n = document.elementFromPoint(r.left + r.width/2, r.top + r.height/2);
+      bad.push((el.id || el.className || el.tagName).toString().trim().slice(0,24) +
+               '<' + (n ? (n.id || n.className || n.tagName).toString().trim().slice(0,24) : 'null'));
+    }
+  });
+  const res = 'hit=' + (bad.length ? 'FAIL' : 'OK') + ' page=' + state.page +
+              ' target=' + targets.length + ' blocked=' + bad.length +
+              (bad.length ? ' :: ' + bad.join(' | ') : '');
+  document.body.setAttribute('data-hit', res);
+  document.title = res;
+  return res;
+}
+
+/* 端到端点击自检：?click=1 —— 在按钮真实中心派发一次点击，看页面是否翻过去 */
+function clickProbe(){
+  const el = $('#startBtn');
+  const r = el.getBoundingClientRect();
+  const n = document.elementFromPoint(r.left + r.width/2, r.top + r.height/2);
+  const hit = !!(n && (el === n || el.contains(n)));
+  if(n) n.click();
+  setTimeout(()=>{
+    const res = 'click=' + (hit ? 'hit' : 'BLOCKED') + ' page=' + state.page +
+                (hit && state.page === 2 ? ' OK' : ' FAIL');
+    document.body.setAttribute('data-click', res);
+    document.title = res;
+  }, 1400);
+}
+
+function boot(){
+  fitStages();
+  buildGrid(2, NOODLES.slice(0,6), 0);
+  buildGrid(3, NOODLES.slice(6,12), 6);
+  buildTray();
+  buildTimeline();
+  paintDots();
+
+  // 封面跳动结束后摘掉动画，按钮的按下回弹（:active）才能接管
+  $$('#p1 .coverJump, #p1 .startWrap').forEach(el=>{
+    el.addEventListener('animationend', (e)=>{
+      if(e.animationName === 'coverHopY' || e.animationName === 'hopSyncY'){
+        el.classList.add('hopDone');
+      }
+    });
+  });
+
+  // 首屏
+  stageP.classList.add('live');
+  state.page = 1;
+  const dbg = new URLSearchParams(location.search).get('dbg');
+  if(dbg){ jump(dbg); return; }
+  const p1 = $('#p1');
+  p1.classList.add('slow');
+  revealCover(p1);
+  paintDots();
+
+  if(new URLSearchParams(location.search).get('t')) setTimeout(runTest, 400);
+  if(new URLSearchParams(location.search).get('hit')) setTimeout(hitProbe, 900);
+  if(new URLSearchParams(location.search).get('click')) setTimeout(clickProbe, 1200);
+}
+
+/* 等封面解码完成再揭开遮罩，让 0.8s 缓速淡入从头演一遍 */
+function revealCover(p1){
+  const veil = $('#veil');
+  let fired = false;
+  const lift = ()=>{
+    if(fired) return;
+    fired = true;
+    if(veil){
+      veil.classList.add('gone');
+      setTimeout(()=>{ veil.remove(); }, 780);
+    }
+    // 揭开封面：优先等下一帧，保证 0.72s 的缓速淡入从头演；
+    // 但某些环境（后台标签页、被隐藏的 iframe）rAF 会被挂起，
+    // 所以再挂一个定时器兜底，绝不让页面停在透明状态点不动
+    const show = ()=>{ if(!p1.classList.contains('on')) p1.classList.add('on'); };
+    requestAnimationFrame(show);
+    setTimeout(show, 120);
+  };
+  // 直接盯住页面上那张封面：它解码完就等于「可以看了」
+  const cover = $('#p1 .cover');
+  const soon = ()=> setTimeout(lift, 70);
+  if(cover && cover.complete && cover.naturalWidth) soon();
+  else if(cover){
+    cover.addEventListener('load', soon, {once:true});
+    cover.addEventListener('error', soon, {once:true});
+  }else soon();
+  addEventListener('load', ()=>setTimeout(lift, 260), {once:true});  // 兜底一：整页就绪
+  setTimeout(lift, 2600);                                            // 兜底二：绝不卡在遮罩上
+}
+
+/* 调试直链：?dbg=1|2|2f|3|3f|4|4done|5|5a|5b|5c|8 —— 静态定格，便于逐页检视 */
+function jump(code){
+  const qs = new URLSearchParams(location.search);
+  const vl = document.getElementById('veil');
+  if(vl) vl.remove();
+  if(!qs.get('anim')) document.documentElement.classList.add('noanim');
+  const n = parseInt(code, 10);
+  $$('.page').forEach(p=>p.classList.remove('on','slow'));
+  stageP.classList.toggle('live', n===1 || n===8);
+  stageL.classList.toggle('live', n>=2 && n<=5);
+  $('#p'+n).classList.add('on');
+  state.page = n;
+
+  if(code === '2f' || code === '3f'){
+    const g = $('#grid'+(code[0]==='2'?2:3));
+    const cards = $$('.card', g).slice(0,3);
+    cards.forEach((c,i)=>{
+      c.dataset.deg = 180;
+      c.querySelector('.inner').style.transform = 'rotateY(180deg)';
+      c.classList.add('turned');
+      if(i===0) c.classList.add('focus');
+    });
+    g.classList.add('hasFocus');
+    $('#c'+code[0]).textContent = '3';
+  }
+  if(code === '4done'){
+    ITEMS.forEach((it)=>{
+      const el = $('.chip[data-id="'+it.id+'"]');
+      const img = el.querySelector('img');
+      const w = img.naturalWidth * (it.w/img.naturalWidth);
+      const hh = img.getBoundingClientRect().height || it.w*0.8;
+      el.style.left = (BOWL.x + it.slot[0] - it.w/2) + 'px';
+      el.style.top  = (BOWL.y + it.slot[1] - it.w*0.4) + 'px';
+      el.style.transform = `rotate(${it.rot}deg) scale(${it.sc})`;
+      el.classList.add('placed','gone');
+    });
+    bowlArea.classList.add('done');
+    $('#toast').classList.add('show');
+  }
+  if(code === '4r'){
+    place($('.chip[data-id="radish"]'), ITEMS.find(x=>x.id==='radish'));
+  }
+  if(code === '4all'){
+    ITEMS.forEach(it=>{ place($('.chip[data-id="'+it.id+'"]'), it); placedSet.clear(); });
+  }
+  if(n === 5){
+    state.tlIdx = code==='5c' ? 2 : (code==='5b' ? 1 : 0);
+    setTrackX(-state.tlIdx*1334, false);
+    updateTlNext();
+    if(code === '5a') openNode(0);
+    if(code === '5b') openNode(2);
+    if(code === '5c') openNode(4);
+  }
+  paintDots();
+  if(qs.get('hit')) setTimeout(hitProbe, 600);
+}
+
+boot();
+</script>
+</body>
+</html>
