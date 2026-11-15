@@ -35,6 +35,7 @@
   --sans:"PingFang SC","Hiragino Sans GB","Source Han Sans SC","Noto Sans SC","Microsoft YaHei",sans-serif;
   --ease:cubic-bezier(.32,.72,.30,1);
   --spring:cubic-bezier(.34,1.42,.64,1);
+  --crop:0px;   /* 铺满模式下横版页上下各被裁掉的逻辑像素，由 fitStages() 写入 */
 }
 
 *,*::before,*::after{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -114,6 +115,26 @@ button{font-family:inherit;color:inherit;border:0;background:none;padding:0;curs
 .page{position:absolute;inset:0;opacity:0;pointer-events:none;overflow:hidden;transition:opacity .3s ease}
 .page.slow{transition:opacity .72s var(--ease)}
 .page.on{opacity:1;pointer-events:auto}
+
+/* ============ 铺满模式（手机）：横版页上下各被裁掉 --crop，
+   版式整体让开这块，木牌尺寸跟着可用高度走 —— 屏幕越高牌子越大 ============ */
+body.cover #p2, body.cover #p3{
+  --ch: calc((640px - var(--crop) * 2) / 2);
+  --cw: calc(var(--ch) * .6232);
+}
+body.cover .grid{top:405px}
+body.cover .lpHead{top:calc(var(--crop) + 4px);height:66px}
+body.cover .lpHead .sign{width:262px}
+body.cover .nextBtn{bottom:calc(var(--crop) + 10px)}
+body.cover .dots{bottom:calc(var(--crop) + 8px)}
+body.cover .p4Top{top:calc(var(--crop) + 8px)}
+body.cover .tlTop{top:calc(var(--crop) + 12px)}
+body.cover .tlSeal{top:calc(var(--crop) + 12px)}
+body.cover .tlHint{bottom:calc(var(--crop) + 14px)}
+/* P4 的「看这碗面的故事」挪到底边正中，别压住右下那盘鲜面条 */
+body.cover #p4 .nextBtn{left:50%;right:auto;transform:translateX(-50%);bottom:calc(var(--crop) + 10px)}
+body.cover #p4 .nextBtn:active{transform:translateX(-50%) scale(.94)}
+body.cover #p4 .dots{display:none}
 
 /* ============ 通用小件 ============ */
 .seal{
@@ -504,28 +525,49 @@ button{font-family:inherit;color:inherit;border:0;background:none;padding:0;curs
 }
 #p8 .p8seal{position:absolute;right:64px;top:1010px;width:56px;height:56px;font-size:21px}
 
-/* 横屏提示：竖屏设备上横版页是整块转 90° 铺满的，这里提醒把手机横过来 */
-.rotate{
-  position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top,0px));z-index:200;
-  transform:translate(-50%,-10px);
-  display:flex;align-items:center;gap:10px;
-  padding:10px 20px 10px 15px;border-radius:40px;
-  background:rgba(43,36,28,.88);color:#f8f0dc;
-  font-size:14px;letter-spacing:.10em;white-space:nowrap;
-  box-shadow:0 8px 22px rgba(40,30,16,.26);
-  opacity:0;pointer-events:none;
-  transition:opacity .45s ease,transform .45s var(--spring);
+/* ============ 横屏引导：手机上横版页是整块转 90° 铺满屏幕的，
+   第一次进横版时用一屏浮层请他转过来，之后不再打扰 ============ */
+#turnGuide{
+  position:fixed;inset:0;z-index:400;
+  display:grid;place-items:center;
+  background:radial-gradient(120% 92% at 50% 48%,rgba(28,22,14,.90) 0%,rgba(16,12,7,.955) 100%);
+  -webkit-backdrop-filter:blur(9px) saturate(.85);
+  backdrop-filter:blur(9px) saturate(.85);
+  opacity:0;visibility:hidden;pointer-events:none;
+  transition:opacity .32s ease,visibility .32s;
 }
-.rotate.show{opacity:1;transform:translate(-50%,0)}
-.rotate svg{
-  width:19px;height:19px;stroke:currentColor;fill:none;
-  stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;
-  animation:rotWiggle 2.6s var(--ease) infinite;
+#turnGuide.show{opacity:1;visibility:visible;pointer-events:auto}
+#turnGuide .tgIn{
+  display:flex;flex-direction:column;align-items:center;
+  transform:translateY(8px);transition:transform .5s var(--spring);
 }
-@keyframes rotWiggle{
-  0%,56%,100%{transform:rotate(0)}
-  68%,86%{transform:rotate(-90deg)}
-  76%,94%{transform:rotate(0)}
+#turnGuide.show .tgIn{transform:none}
+.tgPhone{
+  position:relative;width:42px;height:74px;margin-bottom:28px;
+  border:2px solid rgba(248,240,220,.9);border-radius:9px;
+  animation:tgTurn 2.9s cubic-bezier(.62,.02,.36,1) infinite;
+}
+.tgPhone::after{
+  content:"";position:absolute;left:50%;bottom:7px;width:14px;height:2px;border-radius:2px;
+  transform:translateX(-50%);background:rgba(248,240,220,.66);
+}
+@keyframes tgTurn{
+  0%,28%{transform:rotate(0)}
+  50%,80%{transform:rotate(-90deg)}
+  100%{transform:rotate(0)}
+}
+.tgT{
+  font-family:var(--serif);font-size:23px;letter-spacing:.22em;text-indent:.22em;
+  color:#f8f0dc;
+}
+.tgS{
+  margin-top:11px;font-size:13px;letter-spacing:.14em;
+  color:rgba(248,240,220,.60);font-weight:300;
+}
+.tgTap{
+  margin-top:26px;padding:7px 18px;border-radius:30px;
+  font-size:12px;letter-spacing:.16em;color:rgba(248,240,220,.84);
+  border:1px solid rgba(248,240,220,.26);
 }
 
 @media (prefers-reduced-motion:reduce){
@@ -666,12 +708,13 @@ html.noanim #p1 .cover{opacity:1!important;transform:none!important}
   </section>
 </div>
 
-<div class="rotate" id="rotate" role="status" aria-live="polite">
-  <svg viewBox="0 0 24 24" aria-hidden="true">
-    <rect x="7.2" y="2.8" width="9.6" height="18.4" rx="2.4"/>
-    <path d="M10.6 18.6h2.8"/>
-  </svg>
-  <span>请把手机横过来</span>
+<div id="turnGuide" role="status" aria-live="polite">
+  <div class="tgIn">
+    <i class="tgPhone" aria-hidden="true"></i>
+    <span class="tgT">把手机横过来</span>
+    <span class="tgS">这一屏是横版的，转过来刚好满屏</span>
+    <span class="tgTap">轻触继续</span>
+  </div>
 </div>
 
 <script src="assets/timeline.js"></script>
@@ -729,7 +772,7 @@ const BOWL = {x:667, y:400, rx:196, ry:164};
 
 /* 当前舞台的缩放与旋转。旋转之后 getBoundingClientRect() 拿到的是包围盒，
    坐标换算不能再靠它，统一用下面 toClient / toStage / toStageVec 三件套。 */
-const view = { kp:1, kl:1, rotL:0 };
+const view = { kp:1, kl:1, rotL:0, crop:0 };
 
 /* 竖屏手机要不要把横版舞台「转 90° 正立铺满」：
    要。缩小成 30% 在手机上根本看不清；平板/桌面竖窗保持等比缩小（那些屏幕够大，
@@ -748,20 +791,38 @@ function fitStages(){
   stageP.style.transform = `translate(-50%,-50%) scale(${kp})`;
 
   const rot = needRotate() ? 90 : 0;
-  // 旋转 90° 后，舞台的 1334 长边对应视口高度、750 短边对应视口宽度
-  const kl = rot
-    ? Math.min(vh/1334, vw/750) * .98
-    : Math.min(vw/1334, vh/750) * (vh > vw ? .94 : .985);
-  view.rotL = rot; view.kl = kl;
+  // 舞台的 1334 长边 / 750 短边分别落到屏幕的哪一条边（旋转 90° 时两者互换）
+  const spanLong  = rot ? vh : vw;
+  const spanShort = rot ? vw : vh;
+
+  const kContain = Math.min(spanLong/1334, spanShort/750);
+  const kCover   = Math.max(spanLong/1334, spanShort/750);
+
+  /* 手机上一律「铺满」：750 那条边撑满屏幕，多出来的部分上下各裁一点
+     （逻辑像素，最多 84），其余内容用 CSS 变量 --crop 整体让开。
+     桌面/平板屏幕够大，仍等比缩小，不裁切。 */
+  let crop = 0, k = kContain;
+  if(Math.min(vw, vh) <= 700){
+    crop = Math.min(84, Math.max(0, (750 - spanShort/kCover) / 2));
+    k = spanShort / (750 - crop * 2);
+    const cap = spanLong / 1334;          // 1334 那条边不能被裁
+    if(k > cap){ k = cap; crop = 0; }
+    k = Math.min(k, 1.2);                 // 极端细长屏兜底，别把版式撑爆
+  }
+
+  view.rotL = rot; view.kl = k; view.crop = crop;
 
   stageL.style.transform = rot
-    ? `translate(-50%,-50%) rotate(90deg) scale(${kl})`
-    : `translate(-50%,-50%) scale(${kl})`;
+    ? `translate(-50%,-50%) rotate(90deg) scale(${k})`
+    : `translate(-50%,-50%) scale(${k})`;
+
+  document.documentElement.style.setProperty('--crop', crop.toFixed(2) + 'px');
+  document.body.classList.toggle('cover', crop > 1);
 
   document.body.classList.toggle('landscapeNow', vh > vw);
   document.body.dataset.orient = rot ? 'rot' : 'flat';
-  // 调试留痕：?t=1 或控制台里一眼看出当前是「旋转铺满」还是「等比缩小」
-  document.body.dataset.fit = `rot=${rot} kl=${kl.toFixed(3)} vw=${vw} vh=${vh}`;
+  // 调试留痕：?t=1 或控制台里一眼看出当前缩放、旋转与裁切量
+  document.body.dataset.fit = `rot=${rot} kl=${k.toFixed(3)} crop=${crop.toFixed(1)} vw=${vw} vh=${vh}`;
 }
 
 /* 逻辑坐标（1334×750 舞台内）→ 视口坐标 */
@@ -813,7 +874,7 @@ function go(n){
     if(n===5){ state.tlIdx = 0; syncTimeline(true); }
     if(n===2 || n===3) refreshFocus(n);
     // 回到竖屏页（首/尾）后，横屏提示可以再提示一次
-    if(n===1 || n===8) rotHinted.clear();
+    if(n===1 || n===8) turnSeen = false;
     // 重回封面时清掉上次动画的收尾标记，让「颠三下」能再演一次
     if(n===1) $$('#p1 .hopDone').forEach(el=>el.classList.remove('hopDone'));
 
@@ -823,7 +884,7 @@ function go(n){
     nx.classList.add('on');
     state.page = n;
     paintDots();
-    if(n>=2 && n<=7) maybeRotateHint();
+    if(n>=2 && n<=7) showTurnGuide();
     setTimeout(()=>{ state.busy = false; }, 680);
   }, 250);
 }
@@ -843,23 +904,25 @@ function paintDots(){
   });
 }
 
-/* 横屏页提示：只有「真的被旋转了」才需要提示用户横过手机 */
-let rotTimer;
-const rotHinted = new Set();
-function maybeRotateHint(){
-  const el = $('#rotate');
-  const want = view.rotL && state.page >= 2 && state.page <= 7 && !rotHinted.has(state.page);
-  el.classList.toggle('show', want);
-  document.body.classList.toggle('needTurn', !!want);
-  clearTimeout(rotTimer);
-  if(want){
-    rotHinted.add(state.page);
-    rotTimer = setTimeout(()=>{
-      el.classList.remove('show');
-      document.body.classList.remove('needTurn');
-    }, 4200);
-  }
+/* 横屏引导：只有「真的被旋转了」才需要请用户把手机转过来；
+   每进一次横版只弹一次全屏引导，转过来之后自动收起，不再打扰 */
+let turnTimer, turnSeen = false;
+function showTurnGuide(){
+  const g = $('#turnGuide');
+  if(!g) return;
+  if(!view.rotL){ g.classList.remove('show'); return; }
+  if(turnSeen) return;
+  turnSeen = true;
+  g.classList.add('show');
+  clearTimeout(turnTimer);
+  turnTimer = setTimeout(hideTurnGuide, 3200);
 }
+function hideTurnGuide(){
+  const g = $('#turnGuide');
+  if(g) g.classList.remove('show');
+  clearTimeout(turnTimer);
+}
+$('#turnGuide').addEventListener('click', hideTurnGuide);
 
 /* 视口变化：手机地址栏收放、横竖屏切换、桌面拖窗口都走这里 */
 let fitTimer;
@@ -869,12 +932,13 @@ function refit(){
     const wasRot = !!view.rotL;
     fitStages();
     // 用户把手机横过来（或转回去）后，横屏提示可以重新提示一次
-    if(!!view.rotL !== wasRot) rotHinted.clear();
+    if(!!view.rotL !== wasRot) turnSeen = false;
+    if(!view.rotL) hideTurnGuide();
     // 舞台缩放变了，时间轴的像素位移要跟着归一化，否则翻页会错位
     if(state.page === 5){
       setTrackX(-state.tlIdx * 1334, true);
     }
-    if(state.page >= 2 && state.page <= 7) maybeRotateHint();
+    if(state.page >= 2 && state.page <= 7) showTurnGuide();
   }, 90);
 }
 addEventListener('resize', refit);
@@ -1529,7 +1593,17 @@ function runTest(){
     ok('fitAxis', view.rotL
        ? Math.abs(sl.width - 750*view.kl) < 2 && Math.abs(sl.height - 1334*view.kl) < 2
        : Math.abs(sl.width - 1334*view.kl) < 2 && Math.abs(sl.height - 750*view.kl) < 2);
-    ok('fitInView', sl.width <= innerWidth + 2 && sl.height <= innerHeight + 2);
+    // 铺满模式下舞台会盖住视口（允许裁掉上下 --crop），否则必须完整落在视口内
+    ok('fitFill', view.crop > 1
+       ? (sl.width >= innerWidth - 2 && sl.height >= innerHeight - 2)
+       : (sl.width <= innerWidth + 2 && sl.height <= innerHeight + 2));
+    // 被裁掉的那条边，版式内容要整体让开
+    const lhP2 = $('#p2 .lpHead');
+    ok('cropSafe', !view.crop || parseFloat(getComputedStyle(lhP2).top) >= view.crop - 2);
+    // 木牌网格必须完整落在「看得见的那一段」里
+    const g2 = $('#grid2');
+    ok('gridInBand', g2.offsetTop - g2.offsetHeight/2 >= view.crop - 2 &&
+       g2.offsetTop + g2.offsetHeight/2 <= 750 - view.crop + 2);
     ok('rotPortrait', view.rotL === (needRotate() ? 90 : 0));
 
     document.title = R.join(' | ');
@@ -1689,7 +1763,7 @@ function jump(code){
   stageL.classList.toggle('live', n>=2 && n<=5);
   $('#p'+n).classList.add('on');
   state.page = n;
-  if(n >= 2 && n <= 7) maybeRotateHint();
+  // 调试跳转不弹引导浮层（否则截图与命中测试都会拍到它），需要时加 ?guide=1
 
   if(code === '2f' || code === '3f'){
     const g = $('#grid'+(code[0]==='2'?2:3));
@@ -1733,6 +1807,7 @@ function jump(code){
   }
   paintDots();
   if(qs.get('hit')) setTimeout(hitProbe, 600);
+  if(qs.get('guide')){ turnSeen = false; setTimeout(showTurnGuide, 500); }
 }
 
 boot();
