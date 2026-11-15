@@ -300,7 +300,10 @@ button{font-family:inherit;color:inherit;border:0;background:none;padding:0;curs
 .p4Top .t{font-family:var(--serif);font-size:37px;letter-spacing:.26em;text-indent:.26em;color:var(--ink)}
 .p4Top .s{margin-top:10px;font-size:17px;letter-spacing:.26em;color:var(--ink3)}
 
-.bowlArea{position:absolute;left:50%;top:560px;transform:translate(-50%,-50%);width:520px;height:432px}
+.bowlArea{position:absolute;left:50%;top:560px;transform:translate(-50%,-50%);width:520px;height:432px;
+  transition:transform .95s var(--ease)}
+/* 食材托盘收起后下半屏会空一块：成品碗放大并下移，落回视觉中心 */
+.bowlArea.done{transform:translate(-50%,-50%) translateY(58px) scale(1.1)}
 .bowlArea .bowl{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;
   filter:drop-shadow(0 14px 22px rgba(80,52,20,.20))}
 .bowlArea .full{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;
