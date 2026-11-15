@@ -1512,6 +1512,13 @@ function clickProbe(){
   }, 1400);
 }
 
+/* 自检要等遮罩撤掉（线上首屏要等封面下载），否则会误判成「被遮罩挡住」 */
+function afterVeil(fn, tries = 40){
+  if(!document.getElementById('veil')) return fn();
+  if(tries <= 0) return fn();
+  setTimeout(()=>afterVeil(fn, tries - 1), 200);
+}
+
 function boot(){
   fitStages();
   buildGrid(2, NOODLES.slice(0,6), 0);
@@ -1540,8 +1547,8 @@ function boot(){
   paintDots();
 
   if(new URLSearchParams(location.search).get('t')) setTimeout(runTest, 400);
-  if(new URLSearchParams(location.search).get('hit')) setTimeout(hitProbe, 900);
-  if(new URLSearchParams(location.search).get('click')) setTimeout(clickProbe, 1200);
+  if(new URLSearchParams(location.search).get('hit')) afterVeil(hitProbe);
+  if(new URLSearchParams(location.search).get('click')) afterVeil(clickProbe);
 }
 
 /* 等封面解码完成再揭开遮罩，让 0.8s 缓速淡入从头演一遍 */
