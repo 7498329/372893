@@ -395,7 +395,7 @@ button{font-family:inherit;color:inherit;border:0;background:none;padding:0;curs
 .tlTop .k{font-family:var(--serif);font-size:18px;letter-spacing:.42em;color:var(--teal)}
 .tlTop .t{font-family:var(--serif);font-size:36px;letter-spacing:.14em;color:var(--ink);margin-top:4px}
 .tlSeal{position:absolute;right:56px;top:30px;z-index:30;width:50px;height:50px;font-size:19px}
-.tlViewport{position:absolute;inset:0;overflow:hidden;touch-action:pan-y;cursor:grab}
+.tlViewport{position:absolute;inset:0;overflow:hidden;touch-action:none;cursor:grab}
 .tlViewport.drag{cursor:grabbing}
 .tlTrack{position:absolute;left:0;top:0;height:750px;will-change:transform}
 .tlTrack.anim{transition:transform .52s var(--ease)}
@@ -504,16 +504,29 @@ button{font-family:inherit;color:inherit;border:0;background:none;padding:0;curs
 }
 #p8 .p8seal{position:absolute;right:64px;top:1010px;width:56px;height:56px;font-size:21px}
 
-/* 横屏提示 */
+/* 横屏提示：竖屏设备上横版页是整块转 90° 铺满的，这里提醒把手机横过来 */
 .rotate{
-  position:fixed;left:50%;top:14px;transform:translate(-50%,0);z-index:200;
-  padding:9px 18px;border-radius:30px;
-  background:rgba(43,36,28,.82);color:#f6eeda;font-size:13px;letter-spacing:.1em;
-  display:flex;align-items:center;gap:8px;
-  opacity:0;pointer-events:none;transition:opacity .5s ease,transform .5s ease;
+  position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top,0px));z-index:200;
+  transform:translate(-50%,-10px);
+  display:flex;align-items:center;gap:10px;
+  padding:10px 20px 10px 15px;border-radius:40px;
+  background:rgba(43,36,28,.88);color:#f8f0dc;
+  font-size:14px;letter-spacing:.10em;white-space:nowrap;
+  box-shadow:0 8px 22px rgba(40,30,16,.26);
+  opacity:0;pointer-events:none;
+  transition:opacity .45s ease,transform .45s var(--spring);
 }
 .rotate.show{opacity:1;transform:translate(-50%,0)}
-.rotate svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.6}
+.rotate svg{
+  width:19px;height:19px;stroke:currentColor;fill:none;
+  stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;
+  animation:rotWiggle 2.6s var(--ease) infinite;
+}
+@keyframes rotWiggle{
+  0%,56%,100%{transform:rotate(0)}
+  68%,86%{transform:rotate(-90deg)}
+  76%,94%{transform:rotate(0)}
+}
 
 @media (prefers-reduced-motion:reduce){
   *{animation-duration:.001s!important;transition-duration:.001s!important}
@@ -653,9 +666,12 @@ html.noanim #p1 .cover{opacity:1!important;transform:none!important}
   </section>
 </div>
 
-<div class="rotate" id="rotate">
-  <svg viewBox="0 0 24 24"><path d="M4 8h10a5 5 0 0 1 0 10H8"/><path d="M8 4L4 8l4 4"/></svg>
-  横过手机，这一屏更好看
+<div class="rotate" id="rotate" role="status" aria-live="polite">
+  <svg viewBox="0 0 24 24" aria-hidden="true">
+    <rect x="7.2" y="2.8" width="9.6" height="18.4" rx="2.4"/>
+    <path d="M10.6 18.6h2.8"/>
+  </svg>
+  <span>请把手机横过来</span>
 </div>
 
 <script src="assets/timeline.js"></script>
@@ -711,13 +727,67 @@ const $$ = (s,r=document)=>[...r.querySelectorAll(s)];
 const stageP = $('#stageP'), stageL = $('#stageL');
 const BOWL = {x:667, y:400, rx:196, ry:164};
 
+/* 当前舞台的缩放与旋转。旋转之后 getBoundingClientRect() 拿到的是包围盒，
+   坐标换算不能再靠它，统一用下面 toClient / toStage / toStageVec 三件套。 */
+const view = { kp:1, kl:1, rotL:0 };
+
+/* 竖屏手机要不要把横版舞台「转 90° 正立铺满」：
+   要。缩小成 30% 在手机上根本看不清；平板/桌面竖窗保持等比缩小（那些屏幕够大，
+   而且平板本身转个方向就有原生横屏，不必强制）。 */
+function needRotate(){
+  const vw = innerWidth, vh = innerHeight;
+  if(vh <= vw) return false;
+  return Math.min(vw, vh) <= 600;
+}
+
 function fitStages(){
   const vw = innerWidth, vh = innerHeight;
+
   const kp = Math.min(vw/750, vh/1334);
+  view.kp = kp;
   stageP.style.transform = `translate(-50%,-50%) scale(${kp})`;
-  const kl = Math.min(vw/1334, vh/750) * (vh > vw ? .94 : .985);
-  stageL.style.transform = `translate(-50%,-50%) scale(${kl})`;
+
+  const rot = needRotate() ? 90 : 0;
+  // 旋转 90° 后，舞台的 1334 长边对应视口高度、750 短边对应视口宽度
+  const kl = rot
+    ? Math.min(vh/1334, vw/750) * .98
+    : Math.min(vw/1334, vh/750) * (vh > vw ? .94 : .985);
+  view.rotL = rot; view.kl = kl;
+
+  stageL.style.transform = rot
+    ? `translate(-50%,-50%) rotate(90deg) scale(${kl})`
+    : `translate(-50%,-50%) scale(${kl})`;
+
   document.body.classList.toggle('landscapeNow', vh > vw);
+  document.body.dataset.orient = rot ? 'rot' : 'flat';
+  // 调试留痕：?t=1 或控制台里一眼看出当前是「旋转铺满」还是「等比缩小」
+  document.body.dataset.fit = `rot=${rot} kl=${kl.toFixed(3)} vw=${vw} vh=${vh}`;
+}
+
+/* 逻辑坐标（1334×750 舞台内）→ 视口坐标 */
+function toClient(x, y){
+  const vw = innerWidth, vh = innerHeight;
+  const th = view.rotL * Math.PI / 180;
+  const dx = (x - 667) * view.kl, dy = (y - 375) * view.kl;
+  return { x: vw/2 + dx*Math.cos(th) - dy*Math.sin(th),
+           y: vh/2 + dx*Math.sin(th) + dy*Math.cos(th) };
+}
+
+/* 视口坐标 → 逻辑坐标（旋转 90° 时也准） */
+function toStageXY(cx, cy){
+  const vw = innerWidth, vh = innerHeight;
+  const th = -view.rotL * Math.PI / 180;
+  const dx = cx - vw/2, dy = cy - vh/2;
+  return { x: 667 + (dx*Math.cos(th) - dy*Math.sin(th)) / view.kl,
+           y: 375 + (dx*Math.sin(th) + dy*Math.cos(th)) / view.kl };
+}
+function toStage(e){ return toStageXY(e.clientX, e.clientY); }
+
+/* 视口位移 → 逻辑位移：旋转后手指的横向滑动要投影回舞台的 x 轴 */
+function toStageVec(dx, dy){
+  const th = -view.rotL * Math.PI / 180;
+  return { x: (dx*Math.cos(th) - dy*Math.sin(th)) / view.kl,
+           y: (dx*Math.sin(th) + dy*Math.cos(th)) / view.kl };
 }
 
 /* =====================================================================
@@ -742,6 +812,8 @@ function go(n){
 
     if(n===5){ state.tlIdx = 0; syncTimeline(true); }
     if(n===2 || n===3) refreshFocus(n);
+    // 回到竖屏页（首/尾）后，横屏提示可以再提示一次
+    if(n===1 || n===8) rotHinted.clear();
     // 重回封面时清掉上次动画的收尾标记，让「颠三下」能再演一次
     if(n===1) $$('#p1 .hopDone').forEach(el=>el.classList.remove('hopDone'));
 
@@ -751,7 +823,7 @@ function go(n){
     nx.classList.add('on');
     state.page = n;
     paintDots();
-    if(n>=2 && n<=5) maybeRotateHint();
+    if(n>=2 && n<=7) maybeRotateHint();
     setTimeout(()=>{ state.busy = false; }, 680);
   }, 250);
 }
@@ -771,14 +843,22 @@ function paintDots(){
   });
 }
 
-/* 横屏页提示 */
+/* 横屏页提示：只有「真的被旋转了」才需要提示用户横过手机 */
 let rotTimer;
+const rotHinted = new Set();
 function maybeRotateHint(){
   const el = $('#rotate');
-  if(innerHeight <= innerWidth){ el.classList.remove('show'); return; }
-  el.classList.add('show');
+  const want = view.rotL && state.page >= 2 && state.page <= 7 && !rotHinted.has(state.page);
+  el.classList.toggle('show', want);
+  document.body.classList.toggle('needTurn', !!want);
   clearTimeout(rotTimer);
-  rotTimer = setTimeout(()=>el.classList.remove('show'), 4600);
+  if(want){
+    rotHinted.add(state.page);
+    rotTimer = setTimeout(()=>{
+      el.classList.remove('show');
+      document.body.classList.remove('needTurn');
+    }, 4200);
+  }
 }
 
 /* 视口变化：手机地址栏收放、横竖屏切换、桌面拖窗口都走这里 */
@@ -786,12 +866,15 @@ let fitTimer;
 function refit(){
   clearTimeout(fitTimer);
   fitTimer = setTimeout(()=>{
+    const wasRot = !!view.rotL;
     fitStages();
+    // 用户把手机横过来（或转回去）后，横屏提示可以重新提示一次
+    if(!!view.rotL !== wasRot) rotHinted.clear();
     // 舞台缩放变了，时间轴的像素位移要跟着归一化，否则翻页会错位
     if(state.page === 5){
       setTrackX(-state.tlIdx * 1334, true);
     }
-    if(state.page >= 2 && state.page <= 5) maybeRotateHint();
+    if(state.page >= 2 && state.page <= 7) maybeRotateHint();
   }, 90);
 }
 addEventListener('resize', refit);
@@ -802,25 +885,14 @@ if(window.visualViewport) visualViewport.addEventListener('resize', refit);
    P1 / P8
    ===================================================================== */
 $('#startBtn').addEventListener('click', ()=>{
-  lockLandscape();
   go(2);
 });
 
-/* 手机端尽量锁定横屏（需用户手势触发，失败则退回横屏提示） */
-async function lockLandscape(){
-  if(!matchMedia('(pointer:coarse)').matches) return;
-  if(Math.min(innerWidth, innerHeight) > 820) return;   // 触屏笔记本不强行全屏
-  try{
-    if(!document.fullscreenElement && document.documentElement.requestFullscreen){
-      await document.documentElement.requestFullscreen({navigationUI:'hide'});
-    }
-  }catch(_){}
-  try{
-    if(screen.orientation && screen.orientation.lock){
-      await screen.orientation.lock('landscape');
-    }
-  }catch(_){}
-}
+/* 以前这里会尝试 requestFullscreen + orientation.lock 锁横屏。
+   那个做法在 Android 上能成，但一进全屏就一直全屏：回到竖屏的收尾页（P8）
+   会被挤在一个横屏视口里缩成小条，退出全屏的入口还不好找。
+   现在改成「把横版舞台转 90° 铺满」——手机竖着拿时画面是横的，
+   用户把手机横过来就是一张正立的满屏横版；系统自动旋转开着的话也自然对上。 */
 $('#resetBtn').addEventListener('click', ()=>{
   resetAll();
   state.page = 0;
@@ -1057,12 +1129,6 @@ function attachDrag(el, it){
 
 function dist(x,y){ return Math.hypot(x-BOWL.x, y-BOWL.y); }
 
-function toStage(e){
-  const st = stageL.getBoundingClientRect();
-  const k = st.width / 1334;
-  return { x:(e.clientX - st.left)/k, y:(e.clientY - st.top)/k };
-}
-
 function place(el, it){
   const img = el.querySelector('img');
   // 用自然宽高比推尺寸：图片尚未解码也不会算出 0 高，落位永远准确
@@ -1263,7 +1329,8 @@ function openNode(i, silent){
 }
 
 /* 横向拖拽 */
-let currentX = 0, dragging = false, startX = 0, startTrack = 0, lastX = 0, vx = 0, lastT = 0;
+let currentX = 0, dragging = false, startX = 0, startY = 0, startTrack = 0,
+    lastX = 0, lastY = 0, vx = 0, lastT = 0;
 const viewport = $('#tlViewport'), track = $('#tlTrack');
 
 function setTrackX(x, animate){
@@ -1288,30 +1355,31 @@ function syncTimeline(instant){
 
 viewport.addEventListener('pointerdown', (e)=>{
   if(e.target.closest('.tlNode') || e.target.closest('.tlPanel')) return;
-  dragging = true; startX = e.clientX; startTrack = currentX;
-  lastX = e.clientX; vx = 0; lastT = performance.now();
+  dragging = true; startX = e.clientX; startY = e.clientY; startTrack = currentX;
+  lastX = e.clientX; lastY = e.clientY; vx = 0; lastT = performance.now();
   track.classList.remove('anim');
   viewport.classList.add('drag');
   try{ viewport.setPointerCapture(e.pointerId); }catch(_){}
 });
 viewport.addEventListener('pointermove', (e)=>{
   if(!dragging) return;
-  const dx = e.clientX - startX;
-  const st = stageL.getBoundingClientRect();
-  const k = st.width / 1334;
-  setTrackX(startTrack + dx / k, false);
+  // 竖屏旋转 90° 时，这一屏的「横向滑动」在屏幕上是竖向的，
+  // 所以必须 touch-action:none + preventDefault，否则手势会被浏览器当成滚动吞掉
+  if(e.cancelable) e.preventDefault();
+  // 旋转 90° 时，手指的横向位移要投影回舞台 x 轴，否则一拖就跳格
+  const d = toStageVec(e.clientX - startX, e.clientY - startY);
+  setTrackX(startTrack + d.x, false);
   const now = performance.now();
   const dt = Math.max(1, now - lastT);
-  vx = (e.clientX - lastX) / dt;
-  lastX = e.clientX; lastT = now;
-});
+  const step = toStageVec(e.clientX - lastX, e.clientY - lastY);
+  vx = step.x / dt;                      // 逻辑像素/毫秒
+  lastX = e.clientX; lastY = e.clientY; lastT = now;
+}, {passive:false});
 const endDrag = ()=>{
   if(!dragging) return;
   dragging = false;
   viewport.classList.remove('drag');
-  const st = stageL.getBoundingClientRect();
-  const k = st.width / 1334;
-  const projected = currentX + (vx * 240) / k;
+  const projected = currentX + vx * 240;  // vx 已是逻辑像素，不再除缩放
   let idx = Math.round(-projected / 1334);
   idx = Math.max(0, Math.min(2, idx));
   setTrackX(-idx * 1334, true);
@@ -1384,12 +1452,10 @@ function runTest(){
        c0.querySelector('.inner').style.transform.includes('360'));
     ok('gridIsolated', $$('#grid3 .card.turned').length === 0 && $('#c3').textContent === '0');
 
-    // 2) 拖拽吸附（合成指针事件）
+    // 2) 拖拽吸附（合成指针事件，坐标走 toClient，横竖屏/旋转下都成立）
     const chip = $('.chip[data-id="beef"]');
-    const st = stageL.getBoundingClientRect();
-    const k = st.width / 1334;
-    const from = { x: st.left + 180 * k, y: st.top + 240 * k };
-    const to   = { x: st.left + BOWL.x * k, y: st.top + BOWL.y * k };
+    const from = toClient(180, 240);
+    const to   = toClient(BOWL.x, BOWL.y);
     const ev = (type, p)=> new PointerEvent(type, {clientX:p.x, clientY:p.y, bubbles:true, pointerId:1, isPrimary:true});
     chip.dispatchEvent(ev('pointerdown', from));
     chip.dispatchEvent(ev('pointermove', {x:(from.x+to.x)/2, y:(from.y+to.y)/2}));
@@ -1398,25 +1464,28 @@ function runTest(){
     ok('snap', chip.classList.contains('placed'));
     // 拖到碗外应当回位
     const c2 = $('.chip[data-id="radish"]');
+    const out1 = toClient(400, 240);
     c2.dispatchEvent(ev('pointerdown', from));
-    c2.dispatchEvent(ev('pointermove', {x:from.x + 220*k, y:from.y}));
-    c2.dispatchEvent(ev('pointerup', {x:from.x + 220*k, y:from.y}));
+    c2.dispatchEvent(ev('pointermove', out1));
+    c2.dispatchEvent(ev('pointerup', out1));
     ok('noSnapOutside', !c2.classList.contains('placed'));
     // 拖到碗外后必须原地归位，left/top 不被写坏
     ok('noDrift', Math.abs(parseFloat(c2.style.left) - Number(c2.dataset.ox)) < 0.6 &&
        Math.abs(parseFloat(c2.style.top) - Number(c2.dataset.oy)) < 0.6);
     // 同一块料连拖两次，位置不累积漂移
+    const out2 = toClient(300, 310);
     c2.dispatchEvent(ev('pointerdown', from));
-    c2.dispatchEvent(ev('pointermove', {x:from.x + 120*k, y:from.y + 70*k}));
-    c2.dispatchEvent(ev('pointerup', {x:from.x + 120*k, y:from.y + 70*k}));
+    c2.dispatchEvent(ev('pointermove', out2));
+    c2.dispatchEvent(ev('pointerup', out2));
     await sleep(240);
     ok('repeatDrag', Math.abs(parseFloat(c2.style.left) - Number(c2.dataset.ox)) < 0.6 &&
        Math.abs(parseFloat(c2.style.top) - Number(c2.dataset.oy)) < 0.6 &&
        !c2.classList.contains('placed'));
     if(!chip.classList.contains('placed')){
       const rc = chip.getBoundingClientRect();
-      const cx = (rc.left + rc.width/2 - st.left)/k, cy = (rc.top + rc.height/2 - st.top)/k;
-      R.push('dbg:' + Math.round(cx) + ',' + Math.round(cy) + ',' + Math.round(st.left) + ',' + Math.round(st.top) + ',' + Math.round(k*1000)/1000 + ',' + Math.round(rc.width));
+      const d = toStageXY(rc.left + rc.width/2, rc.top + rc.height/2);
+      R.push('dbg:' + Math.round(d.x) + ',' + Math.round(d.y) + ',' + view.rotL + ',' +
+             Math.round(view.kl*1000)/1000 + ',' + Math.round(rc.width));
     }
 
     // 3) 全部入碗 -> 成品
@@ -1452,6 +1521,16 @@ function runTest(){
     const r2 = $('.chip[data-id="radish"]');
     place(r2, ITEMS.find(x=>x.id==='radish'));
     ok('secondRound', bowlArea.classList.contains('done') === false && placedSet.size === 1);
+
+    // 7) 横版舞台在竖屏设备上「旋转正立铺满」而不是缩小成一小块
+    const c00 = toClient(0, 0), back = toStageXY(c00.x, c00.y);
+    ok('coordInverse', Math.abs(back.x) < 1 && Math.abs(back.y) < 1);
+    const sl = stageL.getBoundingClientRect();
+    ok('fitAxis', view.rotL
+       ? Math.abs(sl.width - 750*view.kl) < 2 && Math.abs(sl.height - 1334*view.kl) < 2
+       : Math.abs(sl.width - 1334*view.kl) < 2 && Math.abs(sl.height - 750*view.kl) < 2);
+    ok('fitInView', sl.width <= innerWidth + 2 && sl.height <= innerHeight + 2);
+    ok('rotPortrait', view.rotL === (needRotate() ? 90 : 0));
 
     document.title = R.join(' | ');
     document.body.setAttribute('data-test', R.join(' | '));
@@ -1512,6 +1591,18 @@ function clickProbe(){
   }, 1400);
 }
 
+/* 几何自检：?geo=1 —— 打印舞台旋转/居中是否精确 */
+function geoProbe(){
+  fitStages();
+  const r = stageL.getBoundingClientRect();
+  const res = `geo vw=${innerWidth} vh=${innerHeight} rot=${view.rotL} kl=${view.kl.toFixed(3)}` +
+              ` box=${r.left.toFixed(1)},${r.top.toFixed(1)},${r.width.toFixed(1)}x${r.height.toFixed(1)}` +
+              ` center=${(r.left+r.width/2).toFixed(1)},${(r.top+r.height/2).toFixed(1)}`;
+  document.body.setAttribute('data-geo', res);
+  document.title = res;
+  return res;
+}
+
 /* 自检要等遮罩撤掉（线上首屏要等封面下载），否则会误判成「被遮罩挡住」 */
 function afterVeil(fn, tries = 40){
   if(!document.getElementById('veil')) return fn();
@@ -1540,13 +1631,18 @@ function boot(){
   stageP.classList.add('live');
   state.page = 1;
   const dbg = new URLSearchParams(location.search).get('dbg');
-  if(dbg){ jump(dbg); return; }
+  if(dbg){
+    jump(dbg);
+    if(new URLSearchParams(location.search).get('hit')) setTimeout(hitProbe, 600);
+    return;
+  }
   const p1 = $('#p1');
   p1.classList.add('slow');
   revealCover(p1);
   paintDots();
 
   if(new URLSearchParams(location.search).get('t')) setTimeout(runTest, 400);
+  if(new URLSearchParams(location.search).get('geo')) setTimeout(geoProbe, 500);
   if(new URLSearchParams(location.search).get('hit')) afterVeil(hitProbe);
   if(new URLSearchParams(location.search).get('click')) afterVeil(clickProbe);
 }
@@ -1593,6 +1689,7 @@ function jump(code){
   stageL.classList.toggle('live', n>=2 && n<=5);
   $('#p'+n).classList.add('on');
   state.page = n;
+  if(n >= 2 && n <= 7) maybeRotateHint();
 
   if(code === '2f' || code === '3f'){
     const g = $('#grid'+(code[0]==='2'?2:3));
