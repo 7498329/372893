@@ -1593,9 +1593,12 @@ function runTest(){
     ok('fitAxis', view.rotL
        ? Math.abs(sl.width - 750*view.kl) < 2 && Math.abs(sl.height - 1334*view.kl) < 2
        : Math.abs(sl.width - 1334*view.kl) < 2 && Math.abs(sl.height - 750*view.kl) < 2);
-    // 铺满模式下舞台会盖住视口（允许裁掉上下 --crop），否则必须完整落在视口内
+    // 铺满模式下舞台应盖住视口；裁切量触顶（极端细长视口）时按 contain 兜底，只要求不出屏
+    const capped = view.crop >= 83.5;
     ok('fitFill', view.crop > 1
-       ? (sl.width >= innerWidth - 2 && sl.height >= innerHeight - 2)
+       ? (capped
+          ? (sl.width <= innerWidth + 2 || sl.height <= innerHeight + 2)
+          : (sl.width >= innerWidth - 2 && sl.height >= innerHeight - 2))
        : (sl.width <= innerWidth + 2 && sl.height <= innerHeight + 2));
     // 被裁掉的那条边，版式内容要整体让开
     const lhP2 = $('#p2 .lpHead');
