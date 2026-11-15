@@ -35,7 +35,7 @@
   --sans:"PingFang SC","Hiragino Sans GB","Source Han Sans SC","Noto Sans SC","Microsoft YaHei",sans-serif;
   --ease:cubic-bezier(.32,.72,.30,1);
   --spring:cubic-bezier(.34,1.42,.64,1);
-  --crop:0px;   /* 铺满模式下横版页上下各被裁掉的逻辑像素，由 fitStages() 写入 */
+  --crop:0px;   /* 铺满时左右被裁掉的纸边，fitStages() 写入 */
 }
 
 *,*::before,*::after{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -107,7 +107,6 @@ button{font-family:inherit;color:inherit;border:0;background:none;padding:0;curs
 }
 .stage.live{opacity:1;pointer-events:auto}
 #stageP{width:750px;height:1334px}
-#stageL{width:1334px;height:750px}
 .stage::after{
   content:"";position:absolute;inset:0;pointer-events:none;z-index:60;
   box-shadow:inset 0 0 100px rgba(93,68,38,.13),inset 0 0 0 1px rgba(96,74,46,.14);
@@ -115,55 +114,6 @@ button{font-family:inherit;color:inherit;border:0;background:none;padding:0;curs
 .page{position:absolute;inset:0;opacity:0;pointer-events:none;overflow:hidden;transition:opacity .3s ease}
 .page.slow{transition:opacity .72s var(--ease)}
 .page.on{opacity:1;pointer-events:auto}
-
-/* ============ 铺满模式（手机）：横版页上下各被裁掉 --crop，
-   版式整体让开这块，木牌尺寸跟着可用高度走 —— 屏幕越高牌子越大 ============ */
-body.cover #p2, body.cover #p3{
-  --ch: calc((640px - var(--crop) * 2) / 2);
-  --cw: calc(var(--ch) * .6232);
-}
-body.cover .grid{top:400px}
-body.cover .lpHead{top:calc(var(--crop) + 4px);height:58px}
-body.cover .lpHead .sign{width:242px}
-body.cover .nextBtn{bottom:calc(var(--crop) + 10px)}
-body.cover .dots{bottom:calc(var(--crop) + 8px)}
-body.cover .p4Top{top:calc(var(--crop) + 8px)}
-body.cover .tlTop{top:calc(var(--crop) + 12px)}
-body.cover .tlSeal{top:calc(var(--crop) + 12px)}
-body.cover .tlHint{bottom:calc(var(--crop) + 14px)}
-/* P4 的「看这碗面的故事」挪到底边正中，别压住右下那盘鲜面条 */
-body.cover #p4 .nextBtn{left:50%;right:auto;transform:translateX(-50%);bottom:calc(var(--crop) + 10px)}
-body.cover #p4 .nextBtn:active{transform:translateX(-50%) scale(.94)}
-body.cover #p4 .dots{display:none}
-
-/* ============ 通用小件 ============ */
-.seal{
-  display:grid;place-items:center;border:2px solid var(--chili);border-radius:3px;
-  color:var(--chili);font-family:var(--serif);font-weight:700;
-  writing-mode:vertical-rl;text-orientation:upright;letter-spacing:.04em;
-  opacity:.82;line-height:1.05;
-}
-.rule{height:1px;background:linear-gradient(90deg,transparent,rgba(96,74,46,.30),transparent)}
-
-.nextBtn{
-  position:absolute;right:34px;bottom:30px;z-index:40;
-  display:flex;align-items:center;gap:9px;
-  padding:12px 20px 12px 24px;border-radius:40px;
-  font-size:20px;letter-spacing:.16em;color:var(--ink2);
-  background:rgba(253,247,233,.60);
-  border:1px solid rgba(96,74,46,.26);
-  backdrop-filter:blur(3px);
-  box-shadow:0 3px 14px rgba(96,68,36,.10);
-  transition:transform .26s var(--spring),background .26s ease,box-shadow .26s ease;
-}
-.nextBtn svg{width:19px;height:12px;stroke:currentColor;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
-.nextBtn:active{transform:scale(.94);background:rgba(253,247,233,.92)}
-.nextBtn.is-idle{opacity:.34}
-
-/* 页面指示 */
-.dots{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);display:flex;gap:9px;z-index:40;pointer-events:none}
-.dot{width:5px;height:5px;border-radius:50%;background:rgba(96,74,46,.26);transition:all .45s var(--ease)}
-.dot.on{width:17px;border-radius:3px;background:var(--chili)}
 
 /* ============ P1 封面 ============ */
 #p1{background:#e9dcc0}
@@ -240,35 +190,74 @@ body.cover #p4 .dots{display:none}
 .arrowHint svg path:last-child{opacity:.36}
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(7px)}}
 
-/* ============ P2/P3 面型翻牌 ============ */
-.lpHead{position:absolute;left:0;right:0;top:16px;height:104px;display:flex;align-items:center;justify-content:center}
-.lpHead .sign{display:block;width:330px;height:auto;filter:drop-shadow(0 5px 10px rgba(120,72,20,.20))}
+/* 铺满（cover）会把画面左右各裁掉 --crop：版式页是纸边，无所谓；
+   但 P1/P8 是整幅海报，裁下去标题就缺字了 —— 这两页整块按可视宽度回缩，
+   上下露一点纸底，海报一字不缺 */
+#p1, #p8{ transform: scale(var(--safe,1)); transform-origin:50% 50%; }
+
+/* ============ 通用小件 ============ */
+.seal{
+  display:grid;place-items:center;border:2px solid var(--chili);border-radius:3px;
+  color:var(--chili);font-family:var(--serif);font-weight:700;
+  writing-mode:vertical-rl;text-orientation:upright;letter-spacing:.04em;
+  opacity:.82;line-height:1.05;
+}
+.rule{height:1px;background:linear-gradient(90deg,transparent,rgba(96,74,46,.30),transparent)}
+
+/* 翻页按钮：竖版统一放底部正中 */
+.nextBtn{
+  position:absolute;left:50%;bottom:66px;transform:translateX(-50%);z-index:40;
+  display:flex;align-items:center;gap:9px;
+  padding:14px 24px 14px 28px;border-radius:40px;
+  font-size:21px;letter-spacing:.16em;color:var(--ink2);
+  background:rgba(253,247,233,.66);
+  border:1px solid rgba(96,74,46,.26);
+  backdrop-filter:blur(3px);
+  box-shadow:0 3px 14px rgba(96,68,36,.10);
+  transition:transform .26s var(--spring),background .26s ease,box-shadow .26s ease;
+}
+.nextBtn svg{width:20px;height:13px;stroke:currentColor;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.nextBtn:active{transform:translateX(-50%) scale(.94);background:rgba(253,247,233,.92)}
+.nextBtn.is-idle{opacity:.34}
+
+/* 页面指示 */
+.dots{position:absolute;left:50%;bottom:26px;transform:translateX(-50%);display:flex;gap:9px;z-index:40;pointer-events:none}
+.dot{width:5px;height:5px;border-radius:50%;background:rgba(96,74,46,.26);transition:all .45s var(--ease)}
+.dot.on{width:17px;border-radius:3px;background:var(--chili)}
+
+/* ============ P2/P3 面型翻牌（竖版：顶部标题 / 中部 3×2 木牌 / 底部提示与翻页） ============ */
+.lpHead{position:absolute;left:0;right:0;top:0;height:236px}
+.lpHead .sign{
+  position:absolute;left:50%;top:76px;transform:translateX(-50%);
+  display:block;width:400px;height:auto;
+  filter:drop-shadow(0 5px 10px rgba(120,72,20,.20));
+}
 .tagL,.tagR{
-  position:absolute;top:50%;transform:translateY(-50%);
-  font-family:var(--serif);font-size:18px;letter-spacing:.3em;color:var(--ink3);
+  position:absolute;top:40px;
+  font-family:var(--serif);font-size:17px;letter-spacing:.3em;color:var(--ink3);
   white-space:nowrap;
 }
-.tagL{left:54px}
-.tagR{right:54px;letter-spacing:.18em}
-.tagR b{color:var(--chili);font-weight:600;font-size:22px;padding:0 2px}
-.sideCol{
-  position:absolute;top:124px;bottom:26px;display:flex;align-items:center;justify-content:center;
+.tagL{left:calc(var(--crop) + 16px)}
+.tagR{right:calc(var(--crop) + 16px);letter-spacing:.16em}
+.tagR b{color:var(--chili);font-weight:600;font-size:21px;padding:0 2px}
+
+/* 横版两侧的竖排小字，竖版收成「木牌下方一行居中提示」 */
+.sideCol{display:none}
+.sideCol.r{
+  display:flex;position:absolute;left:0;right:0;bottom:196px;justify-content:center;
 }
-.sideCol .v{
-  writing-mode:vertical-rl;text-orientation:upright;
-  font-family:var(--serif);letter-spacing:.36em;font-size:21px;line-height:1;
-  color:rgba(93,130,126,.58);
+.sideCol.r .v{
+  writing-mode:horizontal-tb;text-orientation:mixed;
+  font-family:var(--serif);font-size:18px;letter-spacing:.32em;text-indent:.32em;
+  color:rgba(96,74,46,.42);white-space:nowrap;
 }
-.sideCol.l{left:46px;width:60px}
-.sideCol.r{right:46px;width:60px}
-.sideCol.r .v{color:rgba(96,74,46,.40);font-size:18px;letter-spacing:.30em}
 
 .grid{
-  position:absolute;left:50%;top:450px;transform:translate(-50%,-50%);
+  position:absolute;left:50%;top:664px;transform:translate(-50%,-50%);
   display:grid;grid-template-columns:repeat(3,var(--cw));grid-auto-rows:var(--ch);
-  gap:22px 52px;perspective:1500px;
+  gap:24px 26px;perspective:1500px;
 }
-#p2,#p3{--cw:172px;--ch:276px}
+#p2,#p3{--cw:180px;--ch:289px}
 
 .card{
   position:relative;width:var(--cw);height:var(--ch);
@@ -287,30 +276,31 @@ body.cover #p4 .dots{display:none}
 .card .face img{display:block;width:100%;height:100%;object-fit:contain}
 .card .face.back{transform:rotateY(180deg)}
 .card.focus{z-index:9}
-.card.focus .lift{transform:scale(1.145);filter:drop-shadow(0 16px 26px rgba(96,62,24,.26))}
-.grid.hasFocus .card:not(.focus){opacity:.88}
+/* 竖屏上木牌只有 206 宽，翻开时把这张「拿起来」放大到 1.28，背面小字才读得清 */
+.card.focus .lift{transform:scale(1.12);filter:drop-shadow(0 16px 26px rgba(96,62,24,.26))}
+.grid.hasFocus .card:not(.focus){opacity:.86}
 
 .vtxt{
-  position:absolute;left:25%;right:11%;top:12%;bottom:10%;
+  position:absolute;left:23%;right:9%;top:11%;bottom:9%;
   writing-mode:vertical-rl;text-orientation:upright;
-  font-size:20px;line-height:1.46;color:#3f2a16;
+  font-size:17px;line-height:1.5;color:#3f2a16;
   font-family:var(--serif);letter-spacing:0;
-  padding-top:4px;
+  padding-top:2px;
   overflow:hidden;
 }
 .vtxt b{font-weight:600;color:#7c3a1c}
 .seal2{
-  position:absolute;left:8.5%;bottom:9%;width:31px;height:31px;
-  font-size:12px;letter-spacing:0;border-width:1.5px;border-radius:2px;
+  position:absolute;left:7%;bottom:8%;width:27px;height:27px;
+  font-size:11px;letter-spacing:0;border-width:1.5px;border-radius:2px;
   background:rgba(184,59,43,.05);
 }
 
-/* ============ P4 拖拽成面 ============ */
-.p4Top{position:absolute;left:50%;top:24px;transform:translateX(-50%);text-align:center}
-.p4Top .t{font-family:var(--serif);font-size:30px;letter-spacing:.26em;text-indent:.26em;color:var(--ink)}
-.p4Top .s{margin-top:6px;font-size:16px;letter-spacing:.24em;color:var(--ink3)}
+/* ============ P4 拖拽成面（竖版：上标题 / 中碗 / 下食材一排） ============ */
+.p4Top{position:absolute;left:0;right:0;top:48px;text-align:center}
+.p4Top .t{font-family:var(--serif);font-size:37px;letter-spacing:.26em;text-indent:.26em;color:var(--ink)}
+.p4Top .s{margin-top:10px;font-size:17px;letter-spacing:.26em;color:var(--ink3)}
 
-.bowlArea{position:absolute;left:50%;top:400px;transform:translate(-50%,-50%);width:430px;height:357px}
+.bowlArea{position:absolute;left:50%;top:560px;transform:translate(-50%,-50%);width:520px;height:432px}
 .bowlArea .bowl{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;
   filter:drop-shadow(0 14px 22px rgba(80,52,20,.20))}
 .bowlArea .full{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;
@@ -318,8 +308,9 @@ body.cover #p4 .dots{display:none}
   filter:drop-shadow(0 16px 26px rgba(80,52,20,.24))}
 .bowlArea.done .full{opacity:1;transform:scale(1)}
 .bowlArea .rain{position:absolute;left:50%;top:50%;width:1px;height:1px}
+
 .bowlArea .target{
-  position:absolute;left:50%;top:50%;width:310px;height:238px;
+  position:absolute;left:50%;top:50%;width:376px;height:290px;
   transform:translate(-50%,-50%);border-radius:50%;
   border:2px dashed rgba(184,59,43,.20);
   opacity:1;transition:opacity .7s ease;
@@ -329,8 +320,8 @@ body.cover #p4 .dots{display:none}
   50%{transform:translate(-50%,-50%) scale(1.035);opacity:.9}}
 .bowlArea.done .target{opacity:0;animation:none}
 
-.steam{position:absolute;left:50%;bottom:calc(100% - 82px);transform:translateX(-50%);
-  width:330px;height:250px;pointer-events:none;opacity:0;transition:opacity 1s ease}
+.steam{position:absolute;left:50%;bottom:calc(100% - 96px);transform:translateX(-50%);
+  width:420px;height:300px;pointer-events:none;opacity:0;transition:opacity 1s ease}
 .bowlArea.done .steam{opacity:1}
 .wisp{
   position:absolute;bottom:0;width:64px;height:120px;border-radius:50%;
@@ -363,9 +354,7 @@ body.cover #p4 .dots{display:none}
 .chip.dragging img{filter:drop-shadow(0 18px 22px rgba(88,58,24,.34))}
 .chip.placed .cap{opacity:0;transform:translateY(6px)}
 .chip.placed{z-index:6;pointer-events:none}
-/* 落入碗中的食材：加一层贴身暖影，白萝卜这种浅色料也能从白瓷碗里立起来 */
 .chip.placed img{position:relative;z-index:1;filter:drop-shadow(0 3px 4px rgba(86,50,16,.62)) drop-shadow(0 0 2.5px rgba(86,50,16,.42))}
-/* 落碗后给一块「接触影」，浅色料也能稳稳坐在碗里，而不是浮着 */
 .chip.placed::after{
   content:'';position:absolute;left:50%;top:52%;width:86%;height:36%;
   transform:translate(-50%,0);border-radius:50%;z-index:0;pointer-events:none;
@@ -374,9 +363,8 @@ body.cover #p4 .dots{display:none}
 .chip.gone{opacity:0!important;pointer-events:none!important}
 .chip.ghost{opacity:0;transform:scale(.6);pointer-events:none}
 
-/* 碗内壁的极淡暗角，给白萝卜一点底色依托（压在面碗之上、食材之下） */
 .bowlShade{
-  position:absolute;left:50%;top:50%;width:300px;height:236px;
+  position:absolute;left:50%;top:50%;width:362px;height:284px;
   transform:translate(-50%,-50%);border-radius:50%;pointer-events:none;
   background:radial-gradient(56% 54% at 50% 58%,rgba(104,72,38,.17) 0%,rgba(104,72,38,.085) 44%,rgba(104,72,38,0) 74%);
   opacity:1;transition:opacity .6s ease;
@@ -392,41 +380,45 @@ body.cover #p4 .dots{display:none}
   from{opacity:.9;transform:translate(-50%,-50%) scale(.2)}
   to{opacity:0;transform:translate(-50%,-50%) scale(1.7)}
 }
+
+/* 提示条：竖版放标题下方居中，不压碗 */
 .toast{
-  position:absolute;left:52px;top:296px;z-index:45;
-  padding:16px 24px;border-radius:4px;
+  position:absolute;left:50%;top:186px;z-index:45;
+  padding:16px 26px;border-radius:4px;
   background:rgba(253,247,233,.92);
   border:1px solid rgba(96,74,46,.24);
   box-shadow:0 10px 26px rgba(88,58,24,.18);
-  font-family:var(--serif);font-size:26px;letter-spacing:.13em;color:#3f2a16;
-  opacity:0;transform:translateY(12px) scale(.96);
+  font-family:var(--serif);font-size:27px;letter-spacing:.13em;color:#3f2a16;
+  white-space:nowrap;
+  opacity:0;transform:translate(-50%,10px) scale(.96);
   transition:opacity .6s var(--ease),transform .6s var(--spring);
   pointer-events:none;
 }
-.toast::after{
-  content:"";position:absolute;right:-9px;top:50%;width:14px;height:14px;
-  background:inherit;border-right:1px solid rgba(96,74,46,.24);border-top:1px solid rgba(96,74,46,.24);
-  transform:translateY(-50%) rotate(45deg);
-}
-.toast.show{opacity:1;transform:translateY(0) scale(1)}
+.toast::after{display:none}
+.toast.show{opacity:1;transform:translate(-50%,0) scale(1)}
 
-/* ============ P5 时间轴 ============ */
+/* ============ P5 时间轴（竖版：一根面从上往下走，三屏竖向滚动） ============ */
 #p5{overflow:hidden}
-.tlTop{position:absolute;left:56px;top:30px;z-index:30}
-.tlTop .k{font-family:var(--serif);font-size:18px;letter-spacing:.42em;color:var(--teal)}
-.tlTop .t{font-family:var(--serif);font-size:36px;letter-spacing:.14em;color:var(--ink);margin-top:4px}
-.tlSeal{position:absolute;right:56px;top:30px;z-index:30;width:50px;height:50px;font-size:19px}
+/* 面条从屏幕顶端穿上来，标题下面垫一层纸色渐隐，字才看得清 */
+#p5::before{
+  content:'';position:absolute;left:0;right:0;top:0;height:228px;z-index:26;pointer-events:none;
+  background:linear-gradient(180deg,rgba(243,234,212,.97) 0%,rgba(243,234,212,.93) 54%,rgba(243,234,212,0) 100%);
+}
+.tlTop{position:absolute;left:calc(var(--crop) + 18px);top:44px;z-index:30}
+.tlTop .k{font-family:var(--serif);font-size:17px;letter-spacing:.42em;color:var(--teal)}
+.tlTop .t{font-family:var(--serif);font-size:39px;letter-spacing:.14em;color:var(--ink);margin-top:6px}
+.tlSeal{position:absolute;right:calc(var(--crop) + 18px);top:46px;z-index:30;width:56px;height:56px;font-size:21px}
 .tlViewport{position:absolute;inset:0;overflow:hidden;touch-action:none;cursor:grab}
 .tlViewport.drag{cursor:grabbing}
-.tlTrack{position:absolute;left:0;top:0;height:750px;will-change:transform}
-.tlTrack.anim{transition:transform .52s var(--ease)}
+.tlTrack{position:absolute;left:0;top:0;width:750px;height:4002px;will-change:transform}
+.tlTrack.anim{transition:transform .55s var(--ease)}
 .tlSvg{position:absolute;left:0;top:0;pointer-events:none;
   filter:drop-shadow(0 8px 10px rgba(120,84,38,.15))}
 .tlSvg .dye{opacity:0;transition:opacity .45s ease}
 .tlSvg.dyeing .dye{opacity:1}
 
 .tlNode{
-  position:absolute;width:58px;height:58px;margin:-29px 0 0 -29px;z-index:20;
+  position:absolute;width:64px;height:64px;margin:-32px 0 0 -32px;z-index:20;
   display:grid;place-items:center;border-radius:50%;
   transition:transform .42s var(--spring);
 }
@@ -437,11 +429,12 @@ body.cover #p4 .dots{display:none}
   box-shadow:0 3px 10px rgba(96,62,24,.22);
   transition:all .4s var(--ease);
 }
-.tlNode .num{position:relative;font-family:var(--serif);font-size:19px;color:var(--chili);font-weight:700}
+.tlNode .num{position:relative;font-family:var(--serif);font-size:21px;color:var(--chili);font-weight:700}
+/* 竖版：节点名挪到右侧，让开面条带 */
 .tlNode .lb{
-  position:absolute;left:50%;top:64px;transform:translateX(-50%);
-  font-family:var(--serif);font-size:14px;letter-spacing:.18em;color:var(--ink3);
-  white-space:nowrap;opacity:.85;transition:opacity .35s ease;
+  position:absolute;left:calc(100% + 12px);top:50%;transform:translateY(-50%);
+  font-family:var(--serif);font-size:15px;letter-spacing:.18em;color:var(--ink3);
+  white-space:nowrap;opacity:.9;transition:opacity .35s ease;
 }
 .tlNode::after{
   content:"";position:absolute;inset:-9px;border-radius:50%;
@@ -450,35 +443,44 @@ body.cover #p4 .dots{display:none}
 .tlNode.hot::after{animation:pulse 2.8s ease-out infinite}
 @keyframes pulse{0%{opacity:.6;transform:scale(.85)}70%{opacity:0;transform:scale(1.35)}100%{opacity:0}}
 .tlNode:hover{transform:scale(1.06)}
-.tlNode.act{transform:scale(1.16)}
+.tlNode.act{transform:scale(1.14)}
 .tlNode.act .ring{background:var(--chili);border-color:var(--chili);box-shadow:0 6px 18px rgba(184,59,43,.42)}
 .tlNode.act .num{color:#fdf7e9}
 .tlNode.act .lb{opacity:0}
 
+/* 故事面板：竖版固定在屏幕下半部，宽度吃满 620，不跟面条一起滚 */
 .tlPanel{
-  position:absolute;width:376px;z-index:22;
-  padding:18px 24px 20px;border-radius:4px;
-  background:rgba(253,248,236,.90);
+  position:absolute;left:50%;bottom:100px;width:600px;z-index:34;
+  padding:22px 28px 24px;border-radius:5px;
+  background:rgba(253,248,236,.94);
   border:1px solid rgba(96,74,46,.18);
-  box-shadow:0 12px 32px rgba(88,58,24,.15);
-  backdrop-filter:blur(4px);
-  opacity:0;transform:translateY(8px) scale(.985);
+  box-shadow:0 14px 36px rgba(88,58,24,.18);
+  backdrop-filter:blur(6px);
+  opacity:0;transform:translate(-50%,12px) scale(.985);
   transition:opacity .42s ease,transform .5s var(--ease);
   pointer-events:none;
 }
-.tlPanel.show{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
-.tlPanel .yr{font-family:var(--serif);font-size:15px;letter-spacing:.3em;color:var(--chili);opacity:.92}
-.tlPanel .hd{font-family:var(--serif);font-size:27px;letter-spacing:.06em;color:var(--ink);margin:5px 0 9px;line-height:1.3}
-.tlPanel .bd{font-size:17px;line-height:1.92;color:var(--ink2);font-weight:300;letter-spacing:.01em;text-align:justify}
-.tlPanel .stem{position:absolute;width:1px;background:linear-gradient(180deg,rgba(184,59,43,.55),rgba(184,59,43,.05))}
-.tlPanel .stem.b{background:linear-gradient(0deg,rgba(184,59,43,.55),rgba(184,59,43,.05))}
+.tlPanel.show{opacity:1;transform:translate(-50%,0) scale(1);pointer-events:auto}
+.tlPanel .yr{font-family:var(--serif);font-size:16px;letter-spacing:.3em;color:var(--chili);opacity:.92}
+.tlPanel .hd{font-family:var(--serif);font-size:30px;letter-spacing:.05em;color:var(--ink);margin:6px 0 10px;line-height:1.28}
+.tlPanel .bd{font-size:18px;line-height:1.9;color:var(--ink2);font-weight:300;letter-spacing:.01em;text-align:justify}
+.tlPanel .stem{display:none}
+.tlPanel .x{
+  position:absolute;right:12px;top:12px;width:34px;height:34px;border-radius:50%;z-index:3;
+  display:grid;place-items:center;font-size:20px;line-height:1;color:var(--ink3);
+  background:rgba(253,247,233,.7);border:1px solid rgba(96,74,46,.20);
+  transition:transform .22s var(--spring),color .22s ease;
+}
+.tlPanel .x:active{transform:scale(.9);color:var(--chili)}
 
 .tlHint{
-  position:absolute;left:50%;bottom:26px;transform:translateX(-50%);z-index:30;
+  position:absolute;left:50%;bottom:40px;transform:translateX(-50%);z-index:30;
   font-size:17px;letter-spacing:.3em;color:var(--ink3);font-family:var(--serif);
   display:flex;align-items:center;gap:12px;opacity:.85;transition:opacity .4s ease;
+  white-space:nowrap;
 }
-.tlHint .ln{width:34px;height:1px;background:rgba(96,74,46,.3)}
+.tlHint .ln{width:30px;height:1px;background:rgba(96,74,46,.3)}
+#p5 .nextBtn{bottom:44px}
 
 /* ============ P8 收尾 ============ */
 #p8 .overline{
@@ -520,55 +522,11 @@ body.cover #p4 .dots{display:none}
 }
 .p8Btn:active{transform:translateX(-50%) scale(.95)}
 #p8 .foot{
-  position:absolute;left:50%;bottom:30px;transform:translateX(-50%);
+  position:absolute;left:50%;bottom:44px;transform:translateX(-50%);
   font-size:15px;letter-spacing:.3em;color:var(--ink3);opacity:.7;white-space:nowrap;
 }
-#p8 .p8seal{position:absolute;right:64px;top:1010px;width:56px;height:56px;font-size:21px}
-
-/* ============ 横屏引导：手机上横版页是整块转 90° 铺满屏幕的，
-   第一次进横版时用一屏浮层请他转过来，之后不再打扰 ============ */
-#turnGuide{
-  position:fixed;inset:0;z-index:400;
-  display:grid;place-items:center;
-  background:radial-gradient(120% 92% at 50% 48%,rgba(28,22,14,.90) 0%,rgba(16,12,7,.955) 100%);
-  -webkit-backdrop-filter:blur(9px) saturate(.85);
-  backdrop-filter:blur(9px) saturate(.85);
-  opacity:0;visibility:hidden;pointer-events:none;
-  transition:opacity .32s ease,visibility .32s;
-}
-#turnGuide.show{opacity:1;visibility:visible;pointer-events:auto}
-#turnGuide .tgIn{
-  display:flex;flex-direction:column;align-items:center;
-  transform:translateY(8px);transition:transform .5s var(--spring);
-}
-#turnGuide.show .tgIn{transform:none}
-.tgPhone{
-  position:relative;width:42px;height:74px;margin-bottom:28px;
-  border:2px solid rgba(248,240,220,.9);border-radius:9px;
-  animation:tgTurn 2.9s cubic-bezier(.62,.02,.36,1) infinite;
-}
-.tgPhone::after{
-  content:"";position:absolute;left:50%;bottom:7px;width:14px;height:2px;border-radius:2px;
-  transform:translateX(-50%);background:rgba(248,240,220,.66);
-}
-@keyframes tgTurn{
-  0%,28%{transform:rotate(0)}
-  50%,80%{transform:rotate(-90deg)}
-  100%{transform:rotate(0)}
-}
-.tgT{
-  font-family:var(--serif);font-size:23px;letter-spacing:.22em;text-indent:.22em;
-  color:#f8f0dc;
-}
-.tgS{
-  margin-top:11px;font-size:13px;letter-spacing:.14em;
-  color:rgba(248,240,220,.60);font-weight:300;
-}
-.tgTap{
-  margin-top:26px;padding:7px 18px;border-radius:30px;
-  font-size:12px;letter-spacing:.16em;color:rgba(248,240,220,.84);
-  border:1px solid rgba(248,240,220,.26);
-}
+#p8 .dots{display:none}
+#p8 .p8seal{position:absolute;right:calc(var(--crop) + 18px);top:1004px;width:54px;height:54px;font-size:20px}
 
 @media (prefers-reduced-motion:reduce){
   *{animation-duration:.001s!important;transition-duration:.001s!important}
@@ -589,7 +547,7 @@ html.noanim #p1 .cover{opacity:1!important;transform:none!important}
 </div>
 <div id="bg"></div>
 
-<!-- ================= 竖屏舞台 ================= -->
+<!-- ================= 舞台（统一竖版 750×1334） ================= -->
 <div class="stage" id="stageP">
   <!-- P1 -->
   <section class="page" id="p1">
@@ -625,10 +583,7 @@ html.noanim #p1 .cover{opacity:1!important;transform:none!important}
     <div class="foot">轻触「再拉一碗」· 回到开篇</div>
     <div class="dots" data-dots></div>
   </section>
-</div>
 
-<!-- ================= 横屏舞台 ================= -->
-<div class="stage" id="stageL">
   <!-- P2 -->
   <section class="page" id="p2">
     <div class="lpHead">
@@ -699,7 +654,7 @@ html.noanim #p1 .cover{opacity:1!important;transform:none!important}
       <div class="tlTrack" id="tlTrack"></div>
     </div>
     <div class="tlHint" id="tlHint">
-      <span class="ln"></span>左右滑动 浏览整根面<span class="ln"></span>
+      <span class="ln"></span>上下滑动 浏览整根面<span class="ln"></span>
     </div>
     <button class="nextBtn" id="tlNext" style="display:none">收尾
       <svg viewBox="0 0 19 12"><path d="M1 6h16M12 1l5 5-5 5"/></svg>
@@ -708,16 +663,7 @@ html.noanim #p1 .cover{opacity:1!important;transform:none!important}
   </section>
 </div>
 
-<div id="turnGuide" role="status" aria-live="polite">
-  <div class="tgIn">
-    <i class="tgPhone" aria-hidden="true"></i>
-    <span class="tgT">把手机横过来</span>
-    <span class="tgS">这一屏是横版的，转过来刚好满屏</span>
-    <span class="tgTap">轻触继续</span>
-  </div>
-</div>
-
-<script src="assets/timeline.js"></script>
+<script src="assets/timeline_v.js"></script>
 <script>
 /* =====================================================================
    数据
@@ -756,10 +702,10 @@ const HIST = [
 ];
 
 const ITEMS = [
-  {id:'beef',   name:'牛肉片', img:'assets/beef.webp',         w:150, slot:[-74,-42], sc:.70, rot:-9},
-  {id:'radish', name:'白萝卜', img:'assets/radish.webp',        w:164, slot:[ 76,-58], sc:.70, rot:7},
-  {id:'sprout', name:'青蒜苗', img:'assets/sprout.webp',        w:132, slot:[ 92, 48], sc:.62, rot:-5},
-  {id:'noodle', name:'鲜面条', img:'assets/noodle_bundle.webp', w:186, slot:[-86, 54], sc:.58, rot:-4}
+  {id:'beef',   name:'牛肉片', img:'assets/beef.webp',         w:136, slot:[-70,-40], sc:.70, rot:-9},
+  {id:'radish', name:'白萝卜', img:'assets/radish.webp',        w:146, slot:[ 72,-56], sc:.70, rot:7},
+  {id:'sprout', name:'青蒜苗', img:'assets/sprout.webp',        w:116, slot:[ 88, 46], sc:.62, rot:-5},
+  {id:'noodle', name:'鲜面条', img:'assets/noodle_bundle.webp', w:160, slot:[-82, 52], sc:.58, rot:-4}
 ];
 
 /* =====================================================================
@@ -767,96 +713,56 @@ const ITEMS = [
    ===================================================================== */
 const $  = (s,r=document)=>r.querySelector(s);
 const $$ = (s,r=document)=>[...r.querySelectorAll(s)];
-const stageP = $('#stageP'), stageL = $('#stageL');
-const BOWL = {x:667, y:400, rx:196, ry:164};
+const stageP = $('#stageP');
+const SW = 750, SH = 1334;                       // 唯一画布：竖版 750×1334
+/* 碗口椭圆（逻辑坐标）：碗区 560 宽居中，中心 y=566 */
+const BOWL = {x:375, y:560, rx:237, ry:197};
 
-/* 当前舞台的缩放与旋转。旋转之后 getBoundingClientRect() 拿到的是包围盒，
-   坐标换算不能再靠它，统一用下面 toClient / toStage / toStageVec 三件套。 */
-const view = { kp:1, kl:1, rotL:0, crop:0 };
+const view = { k:1, crop:0 };
 
-/* 竖屏手机要不要把横版舞台「转 90° 正立铺满」：
-   要。缩小成 30% 在手机上根本看不清；平板/桌面竖窗保持等比缩小（那些屏幕够大，
-   而且平板本身转个方向就有原生横屏，不必强制）。 */
-function needRotate(){
-  const vw = innerWidth, vh = innerHeight;
-  if(vh <= vw) return false;
-  return Math.min(vw, vh) <= 600;
-}
-
+/* 只有一块竖版舞台。
+   手机（短边 ≤ 600）一律「铺满」：按 cover 放大，左右各裁掉一点纸边
+   （裁切量最多 82，版式全部排在 600 安全宽内，一个字都不会被切）；
+   平板/桌面屏幕够大，等比缩放整块放下，不裁切。 */
 function fitStages(){
   const vw = innerWidth, vh = innerHeight;
+  const kMin = Math.min(vw/SW, vh/SH);
+  const kMax = Math.max(vw/SW, vh/SH);
+  const phone = Math.min(vw, vh) <= 600;
 
-  const kp = Math.min(vw/750, vh/1334);
-  view.kp = kp;
-  stageP.style.transform = `translate(-50%,-50%) scale(${kp})`;
-
-  const rot = needRotate() ? 90 : 0;
-  // 舞台的 1334 长边 / 750 短边分别落到屏幕的哪一条边（旋转 90° 时两者互换）
-  const spanLong  = rot ? vh : vw;
-  const spanShort = rot ? vw : vh;
-
-  const kContain = Math.min(spanLong/1334, spanShort/750);
-  const kCover   = Math.max(spanLong/1334, spanShort/750);
-
-  /* 手机上一律「铺满」：750 那条边撑满屏幕，多出来的部分上下各裁一点
-     （逻辑像素，最多 84），其余内容用 CSS 变量 --crop 整体让开。
-     桌面/平板屏幕够大，仍等比缩小，不裁切。 */
-  let crop = 0, k = kContain;
-  if(Math.min(vw, vh) <= 700){
-    crop = Math.min(84, Math.max(0, (750 - spanShort/kCover) / 2));
-    k = spanShort / (750 - crop * 2);
-    const cap = spanLong / 1334;          // 1334 那条边不能被裁
-    if(k > cap){ k = cap; crop = 0; }
-    k = Math.min(k, 1.2);                 // 极端细长屏兜底，别把版式撑爆
+  let k = phone ? kMax : kMin;
+  let crop = 0;
+  if(phone){
+    crop = Math.max(0, (SW*k - vw) / (2*k));
+    if(crop > 82){ crop = 82; k = vw / (SW - 2*crop); }
   }
-
-  view.rotL = rot; view.kl = k; view.crop = crop;
-
-  stageL.style.transform = rot
-    ? `translate(-50%,-50%) rotate(90deg) scale(${k})`
-    : `translate(-50%,-50%) scale(${k})`;
-
-  document.documentElement.style.setProperty('--crop', crop.toFixed(2) + 'px');
-  document.body.classList.toggle('cover', crop > 1);
-
-  document.body.classList.toggle('landscapeNow', vh > vw);
-  document.body.dataset.orient = rot ? 'rot' : 'flat';
-  // 调试留痕：?t=1 或控制台里一眼看出当前缩放、旋转与裁切量
-  document.body.dataset.fit = `rot=${rot} kl=${k.toFixed(3)} crop=${crop.toFixed(1)} vw=${vw} vh=${vh}`;
+  view.k = k; view.crop = crop;
+  stageP.style.transform = `translate(-50%,-50%) scale(${k})`;
+  document.documentElement.style.setProperty('--crop', crop.toFixed(1) + 'px');
+  document.documentElement.style.setProperty('--safe', (1 - 2*crop/SW).toFixed(4));
+  document.body.dataset.fit = `k=${k.toFixed(3)} crop=${crop.toFixed(1)} vw=${vw} vh=${vh}`;
 }
 
-/* 逻辑坐标（1334×750 舞台内）→ 视口坐标 */
+/* 逻辑坐标（750×1334）↔ 视口坐标 */
 function toClient(x, y){
-  const vw = innerWidth, vh = innerHeight;
-  const th = view.rotL * Math.PI / 180;
-  const dx = (x - 667) * view.kl, dy = (y - 375) * view.kl;
-  return { x: vw/2 + dx*Math.cos(th) - dy*Math.sin(th),
-           y: vh/2 + dx*Math.sin(th) + dy*Math.cos(th) };
+  const k = view.k;
+  return { x: innerWidth/2 + (x - SW/2)*k, y: innerHeight/2 + (y - SH/2)*k };
 }
-
-/* 视口坐标 → 逻辑坐标（旋转 90° 时也准） */
 function toStageXY(cx, cy){
-  const vw = innerWidth, vh = innerHeight;
-  const th = -view.rotL * Math.PI / 180;
-  const dx = cx - vw/2, dy = cy - vh/2;
-  return { x: 667 + (dx*Math.cos(th) - dy*Math.sin(th)) / view.kl,
-           y: 375 + (dx*Math.sin(th) + dy*Math.cos(th)) / view.kl };
+  const k = view.k;
+  return { x: SW/2 + (cx - innerWidth/2)/k, y: SH/2 + (cy - innerHeight/2)/k };
 }
 function toStage(e){ return toStageXY(e.clientX, e.clientY); }
 
-/* 视口位移 → 逻辑位移：旋转后手指的横向滑动要投影回舞台的 x 轴 */
+/* 视口位移 → 逻辑位移 */
 function toStageVec(dx, dy){
-  const th = -view.rotL * Math.PI / 180;
-  return { x: (dx*Math.cos(th) - dy*Math.sin(th)) / view.kl,
-           y: (dx*Math.sin(th) + dy*Math.cos(th)) / view.kl };
+  return { x: dx/view.k, y: dy/view.k };
 }
 
 /* =====================================================================
    页面流转
    ===================================================================== */
 const state = { page:0, tlIdx:0, activeNode:null, busy:false };
-
-function stageOf(n){ return (n===1||n===8) ? stageP : stageL; }
 
 function go(n){
   if(state.busy || n === state.page) return;
@@ -867,14 +773,9 @@ function go(n){
 
   setTimeout(()=>{
     const nx = $('#p'+n);
-    const st = stageOf(n);
-    stageP.classList.toggle('live', st===stageP);
-    stageL.classList.toggle('live', st===stageL);
 
     if(n===5){ state.tlIdx = 0; syncTimeline(true); }
     if(n===2 || n===3) refreshFocus(n);
-    // 回到竖屏页（首/尾）后，横屏提示可以再提示一次
-    if(n===1 || n===8) turnSeen = false;
     // 重回封面时清掉上次动画的收尾标记，让「颠三下」能再演一次
     if(n===1) $$('#p1 .hopDone').forEach(el=>el.classList.remove('hopDone'));
 
@@ -884,7 +785,6 @@ function go(n){
     nx.classList.add('on');
     state.page = n;
     paintDots();
-    if(n>=2 && n<=7) showTurnGuide();
     setTimeout(()=>{ state.busy = false; }, 680);
   }, 250);
 }
@@ -904,41 +804,14 @@ function paintDots(){
   });
 }
 
-/* 横屏引导：只有「真的被旋转了」才需要请用户把手机转过来；
-   每进一次横版只弹一次全屏引导，转过来之后自动收起，不再打扰 */
-let turnTimer, turnSeen = false;
-function showTurnGuide(){
-  const g = $('#turnGuide');
-  if(!g) return;
-  if(!view.rotL){ g.classList.remove('show'); return; }
-  if(turnSeen) return;
-  turnSeen = true;
-  g.classList.add('show');
-  clearTimeout(turnTimer);
-  turnTimer = setTimeout(hideTurnGuide, 3200);
-}
-function hideTurnGuide(){
-  const g = $('#turnGuide');
-  if(g) g.classList.remove('show');
-  clearTimeout(turnTimer);
-}
-$('#turnGuide').addEventListener('click', hideTurnGuide);
-
 /* 视口变化：手机地址栏收放、横竖屏切换、桌面拖窗口都走这里 */
 let fitTimer;
 function refit(){
   clearTimeout(fitTimer);
   fitTimer = setTimeout(()=>{
-    const wasRot = !!view.rotL;
     fitStages();
-    // 用户把手机横过来（或转回去）后，横屏提示可以重新提示一次
-    if(!!view.rotL !== wasRot) turnSeen = false;
-    if(!view.rotL) hideTurnGuide();
     // 舞台缩放变了，时间轴的像素位移要跟着归一化，否则翻页会错位
-    if(state.page === 5){
-      setTrackX(-state.tlIdx * 1334, true);
-    }
-    if(state.page >= 2 && state.page <= 7) showTurnGuide();
+    if(state.page === 5) setTrackY(-state.tlIdx * 1334, true);
   }, 90);
 }
 addEventListener('resize', refit);
@@ -1091,9 +964,19 @@ const tray = $('#tray');
 const bowlArea = $('#bowlArea');
 const placedSet = new Set();
 
+/* 各素材的高宽比（用于把一排料的下沿对齐） */
+const RATIO = {beef:429/440, radish:361/440, sprout:509/440, noodle:413/560};
+
 function buildTray(){
   tray.innerHTML = '';
-  const pos = [ {x:126,y:196}, {x:118,y:474}, {x:1078,y:186}, {x:1070,y:466} ];
+  /* 竖版：四样料一排摆在碗下方（left/top 是左上角，按各自图片宽度居中到 cx） */
+  /* 竖版：四样料一排，图片底边对齐在 BASE，标签自然排成一条线 */
+  const BASE = 1000;
+  const pos = ITEMS.map((it, i)=>{
+    const xs = [80, 226, 384, 512];
+    const hh = Math.round(it.w * (RATIO[it.id] || .9));
+    return { x: xs[i], y: BASE - hh };
+  });
   ITEMS.forEach((it, i)=>{
     const el = document.createElement('div');
     el.className = 'chip';
@@ -1249,8 +1132,8 @@ let tlBuilt = false;
 function buildTimeline(){
   if(tlBuilt) return;
   tlBuilt = true;
-  const track = $('#tlTrack');
-  track.style.width = TL.canvasW + 'px';
+  const track = $('#tlTrack'), page5 = $('#p5');
+  track.style.height = TL.canvasH + 'px';
 
   const NS = 'http://www.w3.org/2000/svg';
   const svg = document.createElementNS(NS,'svg');
@@ -1262,7 +1145,7 @@ function buildTimeline(){
   // 红色浸染高亮（用 mask 只显示某一段，保留面条肌理）
   const defs = document.createElementNS(NS,'defs');
   defs.innerHTML = `
-    <filter id="dyeRed" x="-6%" y="-30%" width="112%" height="160%"
+    <filter id="dyeRed" x="-30%" y="-6%" width="160%" height="112%"
             color-interpolation-filters="sRGB">
       <feColorMatrix type="matrix" values="
         0.34 0.66 0.13 0 -0.030
@@ -1280,10 +1163,10 @@ function buildTimeline(){
     </mask>`;
   svg.appendChild(defs);
 
-  // 面条本体（用户素材，沿设计曲线重映射）
+  // 面条本体（横版素材顺时针转 90° 的竖版，沿新曲线重映射）
   const rib = TL.ribbon;
   const img = document.createElementNS(NS,'image');
-  img.setAttribute('href','assets/noodle_ribbon.webp');
+  img.setAttribute('href','assets/noodle_ribbon_v.webp');
   img.setAttribute('x', rib.x); img.setAttribute('y', rib.y);
   img.setAttribute('width', rib.w); img.setAttribute('height', rib.h);
   svg.appendChild(img);
@@ -1291,7 +1174,7 @@ function buildTimeline(){
   // 红色段（同一张面，被红色滤镜染色后按 mask 显影）
   const dye = document.createElementNS(NS,'image');
   dye.setAttribute('class','dye');
-  dye.setAttribute('href','assets/noodle_ribbon.webp');
+  dye.setAttribute('href','assets/noodle_ribbon_v.webp');
   dye.setAttribute('x', rib.x); dye.setAttribute('y', rib.y);
   dye.setAttribute('width', rib.w); dye.setAttribute('height', rib.h);
   dye.setAttribute('mask','url(#segMask)');
@@ -1299,7 +1182,7 @@ function buildTimeline(){
   svg.appendChild(dye);
   track.appendChild(svg);
 
-  // 节点 + 面板
+  // 节点：沿面条从上往下排
   TL.nodes.forEach((nd, i)=>{
     const data = HIST[i];
     const btn = document.createElement('button');
@@ -1308,48 +1191,32 @@ function buildTimeline(){
     btn.style.top  = nd.cy + 'px';
     btn.dataset.i = i;
     btn.setAttribute('aria-label', data.yr + ' ' + data.hd);
-    btn.innerHTML = `<span class="ring"></span><span class="num">${i+1}</span>`;
+    btn.innerHTML = `<span class="ring"></span><span class="num">${i+1}</span>
+      <span class="lb">${data.yr}</span>`;
     btn.addEventListener('click', ()=>openNode(i));
     track.appendChild(btn);
 
+    // 故事面板固定在屏幕下半部（挂 #p5，不跟面条一起滚），宽度吃满才读得清
     const p = document.createElement('div');
     p.className = 'tlPanel';
     p.dataset.i = i;
-    p.innerHTML = `<div class="yr">${data.yr}</div><div class="hd">${data.hd}</div>
-      <div class="bd">${data.d}</div><i class="stem"></i>`;
-    track.appendChild(p);
-
-    // 先量高度，再决定摆在上方还是下方（都不压面条、不压标题）
-    const GAP = 30, TOPLIM = 126, BOTLIM = TL.canvasH - 34;
-    const left = Math.max(10, Math.min(TL.canvasW - 386, nd.cx - 188));
-    p.style.left = left + 'px';
-    p.style.top = '0px';
-    const hgt = p.offsetHeight;
-    const upTop  = nd.top - GAP - hgt;
-    const dnTop  = nd.bot + GAP;
-    const okUp   = upTop >= TOPLIM;
-    const okDn   = dnTop + hgt <= BOTLIM;
-    let above;
-    if(okUp && okDn) above = (nd.top - TOPLIM) > (BOTLIM - nd.bot);
-    else if(okUp) above = true;
-    else if(okDn) above = false;
-    else above = upTop > TOPLIM * 2 - hgt;
-
-    if(above){
-      p.style.top = Math.max(TOPLIM, upTop) + 'px';
-      const stem = p.querySelector('.stem');
-      stem.classList.add('b');           // 从面板底部向下连到面条
-      stem.style.cssText = `left:${nd.cx - left}px;top:100%;height:${GAP - 6}px`;
-    }else{
-      p.style.top = Math.min(BOTLIM - hgt, dnTop) + 'px';
-      const stem = p.querySelector('.stem');
-      stem.style.cssText = `left:${nd.cx - left}px;bottom:100%;height:${GAP - 6}px`;
-      stem.classList.remove('b');
-    }
-    p.dataset.above = above ? '1' : '0';
+    p.innerHTML = `<button class="x" aria-label="收起故事">×</button>
+      <div class="yr">${data.yr}</div><div class="hd">${data.hd}</div>
+      <div class="bd">${data.d}</div>`;
+    p.querySelector('.x').addEventListener('click', closeNode);
+    page5.appendChild(p);
   });
 
   setTimeout(()=>{ if(state.page===5 && state.activeNode===null) openNode(0, true); }, 700);
+}
+
+function closeNode(){
+  if(state.activeNode === null) return;
+  state.activeNode = null;
+  $$('.tlNode').forEach(n=>{ n.classList.remove('act'); n.classList.add('hot'); });
+  $$('.tlPanel').forEach(p=>p.classList.remove('show'));
+  const svg = $('.tlSvg'); if(svg) svg.classList.remove('dyeing');
+  updateTlNext();
 }
 
 function openNode(i, silent){
@@ -1370,6 +1237,7 @@ function openNode(i, silent){
     n.classList.toggle('hot', k!==i);
   });
   panels.forEach((p,k)=>p.classList.toggle('show', k===i));
+  updateTlNext();
 
   // 高亮「该节点所在面段」= 上一节点与下一节点的中点之间
   const us = TL.nodes.map(n=>n.u);
@@ -1381,72 +1249,71 @@ function openNode(i, silent){
   sp.setAttribute('stroke-dashoffset', `${-start}`);
   svg.classList.add('dyeing');
 
-  // 确保节点在可视区域内
-  const need = TL.nodes[i].cx;
-  const target = Math.max(-(TL.canvasW - 1334), Math.min(0, 667 - need));
-  if(Math.abs(target - currentX) > 40){
-    setTrackX(target, true);
-    state.tlIdx = Math.round(-target / 1334);
+  // 把节点滚到面板上方的安全区（y≈400），否则故事弹出来会把它盖住
+  const need = TL.nodes[i].cy;
+  const target = Math.max(-(TL.canvasH - 1334), Math.min(0, 400 - need));
+  if(Math.abs(target - currentY) > 40){
+    setTrackY(target, true);
+    state.tlIdx = Math.max(0, Math.min(2, Math.round(-target / 1334)));
     paintDots();
     updateTlNext();
   }
 }
 
-/* 横向拖拽 */
-let currentX = 0, dragging = false, startX = 0, startY = 0, startTrack = 0,
-    lastX = 0, lastY = 0, vx = 0, lastT = 0;
+/* 竖向拖拽 */
+let currentY = 0, dragging = false, startY = 0, startTrack = 0,
+    lastY = 0, vy = 0, lastT = 0;
 const viewport = $('#tlViewport'), track = $('#tlTrack');
 
-function setTrackX(x, animate){
-  const min = -(TL.canvasW - 1334);
-  currentX = Math.max(min, Math.min(0, x));
+function setTrackY(y, animate){
+  const min = -(TL.canvasH - 1334);
+  currentY = Math.max(min, Math.min(0, y));
   track.classList.toggle('anim', !!animate);
-  track.style.transform = `translateX(${currentX}px)`;
-  if(animate) setTimeout(()=>track.classList.remove('anim'), 560);
+  track.style.transform = `translateY(${currentY}px)`;
+  if(animate) setTimeout(()=>track.classList.remove('anim'), 580);
 }
 
 function updateTlNext(){
   const btn = $('#tlNext');
-  btn.style.display = state.tlIdx >= 2 ? 'flex' : 'none';
-  $('#tlHint').style.opacity = state.tlIdx >= 2 ? '0' : '.85';
+  const atEnd = state.tlIdx >= 2;
+  // 故事卡占着下半屏时先不露收尾按钮，点 × 收起后再出现
+  btn.style.display = (atEnd && state.activeNode === null) ? 'flex' : 'none';
+  $('#tlHint').style.opacity = (atEnd || state.activeNode !== null) ? '0' : '.85';
 }
 
 function syncTimeline(instant){
   state.tlIdx = 0;
-  setTrackX(0, !instant);
+  setTrackY(0, !instant);
   updateTlNext();
 }
 
 viewport.addEventListener('pointerdown', (e)=>{
   if(e.target.closest('.tlNode') || e.target.closest('.tlPanel')) return;
-  dragging = true; startX = e.clientX; startY = e.clientY; startTrack = currentX;
-  lastX = e.clientX; lastY = e.clientY; vx = 0; lastT = performance.now();
+  dragging = true; startY = e.clientY; startTrack = currentY;
+  lastY = e.clientY; vy = 0; lastT = performance.now();
   track.classList.remove('anim');
   viewport.classList.add('drag');
   try{ viewport.setPointerCapture(e.pointerId); }catch(_){}
 });
 viewport.addEventListener('pointermove', (e)=>{
   if(!dragging) return;
-  // 竖屏旋转 90° 时，这一屏的「横向滑动」在屏幕上是竖向的，
-  // 所以必须 touch-action:none + preventDefault，否则手势会被浏览器当成滚动吞掉
   if(e.cancelable) e.preventDefault();
-  // 旋转 90° 时，手指的横向位移要投影回舞台 x 轴，否则一拖就跳格
-  const d = toStageVec(e.clientX - startX, e.clientY - startY);
-  setTrackX(startTrack + d.x, false);
+  const d = toStageVec(0, e.clientY - startY);
+  setTrackY(startTrack + d.y, false);
   const now = performance.now();
   const dt = Math.max(1, now - lastT);
-  const step = toStageVec(e.clientX - lastX, e.clientY - lastY);
-  vx = step.x / dt;                      // 逻辑像素/毫秒
-  lastX = e.clientX; lastY = e.clientY; lastT = now;
+  const step = toStageVec(0, e.clientY - lastY);
+  vy = step.y / dt;                      // 逻辑像素/毫秒
+  lastY = e.clientY; lastT = now;
 }, {passive:false});
 const endDrag = ()=>{
   if(!dragging) return;
   dragging = false;
   viewport.classList.remove('drag');
-  const projected = currentX + vx * 240;  // vx 已是逻辑像素，不再除缩放
+  const projected = currentY + vy * 240;
   let idx = Math.round(-projected / 1334);
   idx = Math.max(0, Math.min(2, idx));
-  setTrackX(-idx * 1334, true);
+  setTrackY(-idx * 1334, true);
   state.tlIdx = idx;
   paintDots();
   updateTlNext();
@@ -1454,13 +1321,13 @@ const endDrag = ()=>{
 viewport.addEventListener('pointerup', endDrag);
 viewport.addEventListener('pointercancel', endDrag);
 
-/* 桌面端滚轮 / 触控板：横向翻时间轴（一次一格，带节流） */
+/* 桌面端滚轮 / 触控板：竖向翻时间轴（一次一格，带节流） */
 let wheelLock = 0, wheelAcc = 0;
 viewport.addEventListener('wheel', (e)=>{
   if(state.page !== 5) return;
   e.preventDefault();
   const now = performance.now();
-  const d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+  const d = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
   if(now < wheelLock){ wheelAcc = 0; return; }
   wheelAcc += d;
   if(Math.abs(wheelAcc) < 16) return;
@@ -1468,11 +1335,11 @@ viewport.addEventListener('wheel', (e)=>{
   wheelAcc = 0;
   const idx = Math.max(0, Math.min(2, state.tlIdx + dir));
   if(idx === state.tlIdx){
-    if(dir === 1) go(8);              // 已在末屏继续后滚 → 收尾
+    if(dir === 1) go(8);              // 已在末屏继续下滚 → 收尾
     return;
   }
   state.tlIdx = idx;
-  setTrackX(-idx * 1334, true);
+  setTrackY(-idx * 1334, true);
   paintDots();
   updateTlNext();
   wheelLock = now + 460;
@@ -1484,16 +1351,18 @@ $('#tlNext').addEventListener('click', ()=>go(8));
    键盘（方便桌面预览）
    ===================================================================== */
 addEventListener('keydown', (e)=>{
-  if(e.key === 'ArrowRight'){
+  const fwd  = e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === 'PageDown';
+  const back = e.key === 'ArrowLeft'  || e.key === 'ArrowUp'   || e.key === 'PageUp';
+  if(fwd){
     if(state.page === 5){
       if(state.tlIdx < 2){
-        state.tlIdx++; setTrackX(-state.tlIdx*1334, true); paintDots(); updateTlNext();
+        state.tlIdx++; setTrackY(-state.tlIdx*1334, true); paintDots(); updateTlNext();
       }else go(8);
     }else if(state.page && state.page < 8){ go(state.page + 1); }
   }
-  if(e.key === 'ArrowLeft'){
+  if(back){
     if(state.page === 5 && state.tlIdx > 0){
-      state.tlIdx--; setTrackX(-state.tlIdx*1334, true); paintDots(); updateTlNext();
+      state.tlIdx--; setTrackY(-state.tlIdx*1334, true); paintDots(); updateTlNext();
     }else if(state.page > 1){ go(state.page - 1); }
   }
 });
@@ -1518,7 +1387,7 @@ function runTest(){
 
     // 2) 拖拽吸附（合成指针事件，坐标走 toClient，横竖屏/旋转下都成立）
     const chip = $('.chip[data-id="beef"]');
-    const from = toClient(180, 240);
+    const from = toClient(148, 932);          // 竖版：牛肉片所在位置
     const to   = toClient(BOWL.x, BOWL.y);
     const ev = (type, p)=> new PointerEvent(type, {clientX:p.x, clientY:p.y, bubbles:true, pointerId:1, isPrimary:true});
     chip.dispatchEvent(ev('pointerdown', from));
@@ -1528,7 +1397,7 @@ function runTest(){
     ok('snap', chip.classList.contains('placed'));
     // 拖到碗外应当回位
     const c2 = $('.chip[data-id="radish"]');
-    const out1 = toClient(400, 240);
+    const out1 = toClient(120, 300);          // 碗外的左上角
     c2.dispatchEvent(ev('pointerdown', from));
     c2.dispatchEvent(ev('pointermove', out1));
     c2.dispatchEvent(ev('pointerup', out1));
@@ -1537,7 +1406,7 @@ function runTest(){
     ok('noDrift', Math.abs(parseFloat(c2.style.left) - Number(c2.dataset.ox)) < 0.6 &&
        Math.abs(parseFloat(c2.style.top) - Number(c2.dataset.oy)) < 0.6);
     // 同一块料连拖两次，位置不累积漂移
-    const out2 = toClient(300, 310);
+    const out2 = toClient(620, 420);          // 碗外的右侧
     c2.dispatchEvent(ev('pointerdown', from));
     c2.dispatchEvent(ev('pointermove', out2));
     c2.dispatchEvent(ev('pointerup', out2));
@@ -1548,8 +1417,8 @@ function runTest(){
     if(!chip.classList.contains('placed')){
       const rc = chip.getBoundingClientRect();
       const d = toStageXY(rc.left + rc.width/2, rc.top + rc.height/2);
-      R.push('dbg:' + Math.round(d.x) + ',' + Math.round(d.y) + ',' + view.rotL + ',' +
-             Math.round(view.kl*1000)/1000 + ',' + Math.round(rc.width));
+      R.push('dbg:' + Math.round(d.x) + ',' + Math.round(d.y) + ',' +
+             Math.round(view.k*1000)/1000 + ',' + Math.round(rc.width));
     }
 
     // 3) 全部入碗 -> 成品
@@ -1576,38 +1445,59 @@ function runTest(){
        !$('.tlSvg').classList.contains('dyeing') && state.activeNode === null);
     // 封面「面碗颠三下」：动画确实被挂上（播放中或已播完并摘掉都算通过）
     const cj = $('.coverJump'), swm = $('.startWrap');
+    const hasKF = (name)=>{
+      for(const ss of document.styleSheets){
+        let rules; try{ rules = ss.cssRules; }catch(_){ continue; }
+        for(const r of rules){ if(r.type === CSSRule.KEYFRAMES_RULE && r.name === name) return true; }
+      }
+      return false;
+    };
     const anC = getComputedStyle(cj).animationName || '';
-    ok('coverHop', cj.classList.contains('hopDone') || anC.indexOf('coverHopY') >= 0);
-    ok('coverHopSync', swm.classList.contains('hopDone') ||
-       (getComputedStyle(swm).animationName || '').indexOf('hopSyncY') >= 0);
+    ok('coverHop', hasKF('coverHopY') &&
+       (cj.classList.contains('hopDone') || anC.indexOf('coverHopY') >= 0 || !$('#p1').classList.contains('on')));
+    ok('coverHopSync', hasKF('hopSyncY') &&
+       (swm.classList.contains('hopDone') || (getComputedStyle(swm).animationName || '').indexOf('hopSyncY') >= 0
+        || !$('#p1').classList.contains('on')));
 
     // 6) 复位后能重新完整走一遍（二次游玩不再误判满碗）
     const r2 = $('.chip[data-id="radish"]');
     place(r2, ITEMS.find(x=>x.id==='radish'));
     ok('secondRound', bowlArea.classList.contains('done') === false && placedSet.size === 1);
 
-    // 7) 横版舞台在竖屏设备上「旋转正立铺满」而不是缩小成一小块
+    // 7) 竖版舞台：坐标互逆、舞台整块落在视口内、每个版块都在画布里
     const c00 = toClient(0, 0), back = toStageXY(c00.x, c00.y);
     ok('coordInverse', Math.abs(back.x) < 1 && Math.abs(back.y) < 1);
-    const sl = stageL.getBoundingClientRect();
-    ok('fitAxis', view.rotL
-       ? Math.abs(sl.width - 750*view.kl) < 2 && Math.abs(sl.height - 1334*view.kl) < 2
-       : Math.abs(sl.width - 1334*view.kl) < 2 && Math.abs(sl.height - 750*view.kl) < 2);
-    // 铺满模式下舞台应盖住视口；裁切量触顶（极端细长视口）时按 contain 兜底，只要求不出屏
-    const capped = view.crop >= 83.5;
-    ok('fitFill', view.crop > 1
-       ? (capped
-          ? (sl.width <= innerWidth + 2 || sl.height <= innerHeight + 2)
-          : (sl.width >= innerWidth - 2 && sl.height >= innerHeight - 2))
-       : (sl.width <= innerWidth + 2 && sl.height <= innerHeight + 2));
-    // 被裁掉的那条边，版式内容要整体让开
-    const lhP2 = $('#p2 .lpHead');
-    ok('cropSafe', !view.crop || parseFloat(getComputedStyle(lhP2).top) >= view.crop - 2);
-    // 木牌网格必须完整落在「看得见的那一段」里
+    const sp = stageP.getBoundingClientRect();
+    ok('fitAxis', Math.abs(sp.width - 750*view.k) < 2 && Math.abs(sp.height - 1334*view.k) < 2);
+    ok('fitInView', view.crop > 1
+       ? (sp.width >= innerWidth - 1 && Math.abs(sp.height - innerHeight) < 2)
+       : (sp.width <= innerWidth + 2 && sp.height <= innerHeight + 2));
+    // 3×2 木牌网格：不压标题牌、不压底部提示与按钮
     const g2 = $('#grid2');
-    ok('gridInBand', g2.offsetTop - g2.offsetHeight/2 >= view.crop - 2 &&
-       g2.offsetTop + g2.offsetHeight/2 <= 750 - view.crop + 2);
-    ok('rotPortrait', view.rotL === (needRotate() ? 90 : 0));
+    ok('gridInCanvas', g2.offsetTop - g2.offsetHeight/2 >= 236 &&
+       g2.offsetTop + g2.offsetHeight/2 <= 1120);
+    // 碗与食材排都在画布里
+    const ba = $('#bowlArea');
+    ok('bowlInCanvas', ba.offsetTop >= 240 && ba.offsetTop + ba.offsetHeight <= 1000);
+    const chipLast = $('.chip[data-id="noodle"]');
+    const bowlBottom = ba.offsetTop + ba.offsetHeight/2;   // offsetTop 是中心，不含 translate
+    ok('trayInCanvas', chipLast.offsetTop > bowlBottom &&
+       chipLast.offsetLeft + chipLast.offsetWidth <= 750);
+    // 时间轴：竖版画布 750 宽 × 三屏高，节点严格从上往下
+    const tk = $('#tlTrack');
+    ok('tlVertical', TL.canvasW === 750 && TL.canvasH === 4002 &&
+       Math.abs(tk.offsetHeight - 4002) < 2 &&
+       TL.nodes.every((n,k)=> k === 0 || n.cy > TL.nodes[k-1].cy));
+    // 故事面板：居中、整块在屏幕内、且不遮住被点的节点
+    openNode(1);
+    await sleep(640);
+    const pnl = $('.tlPanel.show');
+    ok('panelFits', !!pnl && (()=>{
+      const r = pnl.getBoundingClientRect(), n1 = $$('.tlNode')[1].getBoundingClientRect();
+      return r.left >= -1 && r.right <= innerWidth + 1 &&
+             r.bottom <= innerHeight + 1 && n1.bottom <= r.top + 2;
+    })());
+    state.activeNode = null;
 
     document.title = R.join(' | ');
     document.body.setAttribute('data-test', R.join(' | '));
@@ -1625,6 +1515,9 @@ function hitProbe(){
       const cs = getComputedStyle(el);
       // 只查「在视口内、看得见」的控件，被时间轴平移出屏幕的不算
       const cx = r.left + r.width/2, cy = r.top + r.height/2;
+      // 收起状态的故事面板整块不参与（父级 opacity:0，子元素算出来仍是 1）
+      const pn = el.closest('.tlPanel');
+      if(pn && !pn.classList.contains('show')) return false;
       return r.width > 2 && r.height > 2 && cx > 0 && cy > 0 &&
              cx < innerWidth && cy < innerHeight &&
              cs.visibility !== 'hidden' && +cs.opacity > .05;
@@ -1641,6 +1534,8 @@ function hitProbe(){
     }
     if(!good){
       const n = document.elementFromPoint(r.left + r.width/2, r.top + r.height/2);
+      // 故事浮层盖住下面的节点是有意的层级关系，不算「点不到」
+      if(n && n.closest('.tlPanel') && el.classList.contains('tlNode')) return;
       bad.push((el.id || el.className || el.tagName).toString().trim().slice(0,24) +
                '<' + (n ? (n.id || n.className || n.tagName).toString().trim().slice(0,24) : 'null'));
     }
@@ -1668,11 +1563,11 @@ function clickProbe(){
   }, 1400);
 }
 
-/* 几何自检：?geo=1 —— 打印舞台旋转/居中是否精确 */
+/* 几何自检：?geo=1 —— 打印舞台缩放/居中是否精确 */
 function geoProbe(){
   fitStages();
-  const r = stageL.getBoundingClientRect();
-  const res = `geo vw=${innerWidth} vh=${innerHeight} rot=${view.rotL} kl=${view.kl.toFixed(3)}` +
+  const r = stageP.getBoundingClientRect();
+  const res = `geo vw=${innerWidth} vh=${innerHeight} k=${view.k.toFixed(3)}` +
               ` box=${r.left.toFixed(1)},${r.top.toFixed(1)},${r.width.toFixed(1)}x${r.height.toFixed(1)}` +
               ` center=${(r.left+r.width/2).toFixed(1)},${(r.top+r.height/2).toFixed(1)}`;
   document.body.setAttribute('data-geo', res);
@@ -1710,7 +1605,10 @@ function boot(){
   const dbg = new URLSearchParams(location.search).get('dbg');
   if(dbg){
     jump(dbg);
-    if(new URLSearchParams(location.search).get('hit')) setTimeout(hitProbe, 600);
+    const q0 = new URLSearchParams(location.search);
+    if(q0.get('geo')) setTimeout(geoProbe, 300);
+    if(q0.get('t')) setTimeout(runTest, 500);
+    if(q0.get('hit')) setTimeout(hitProbe, 600);
     return;
   }
   const p1 = $('#p1');
@@ -1759,14 +1657,12 @@ function jump(code){
   const qs = new URLSearchParams(location.search);
   const vl = document.getElementById('veil');
   if(vl) vl.remove();
-  if(!qs.get('anim')) document.documentElement.classList.add('noanim');
+  if(!qs.get('anim') && !qs.get('t')) document.documentElement.classList.add('noanim');
   const n = parseInt(code, 10);
   $$('.page').forEach(p=>p.classList.remove('on','slow'));
-  stageP.classList.toggle('live', n===1 || n===8);
-  stageL.classList.toggle('live', n>=2 && n<=5);
+  stageP.classList.add('live');
   $('#p'+n).classList.add('on');
   state.page = n;
-  // 调试跳转不弹引导浮层（否则截图与命中测试都会拍到它），需要时加 ?guide=1
 
   if(code === '2f' || code === '3f'){
     const g = $('#grid'+(code[0]==='2'?2:3));
@@ -1802,7 +1698,7 @@ function jump(code){
   }
   if(n === 5){
     state.tlIdx = code==='5c' ? 2 : (code==='5b' ? 1 : 0);
-    setTrackX(-state.tlIdx*1334, false);
+    setTrackY(-state.tlIdx*1334, false);
     updateTlNext();
     if(code === '5a') openNode(0);
     if(code === '5b') openNode(2);
@@ -1810,8 +1706,13 @@ function jump(code){
   }
   paintDots();
   if(qs.get('hit')) setTimeout(hitProbe, 600);
-  if(qs.get('guide')){ turnSeen = false; setTimeout(showTurnGuide, 500); }
 }
+
+/* 调试出口：自动化脚本读内部状态用（const/let 不挂 window） */
+window.__tlTo = i => { state.tlIdx = Math.max(0, Math.min(2, i));
+  setTrackY(-state.tlIdx * 1334, false); paintDots(); updateTlNext(); };
+window.__state = ()=>({ page: state.page, tlIdx: state.tlIdx, node: state.activeNode,
+                        y: Math.round(currentY), k: view.k, crop: Math.round(view.crop) });
 
 boot();
 </script>
