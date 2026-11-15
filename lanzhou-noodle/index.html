@@ -728,7 +728,10 @@ function fitStages(){
   const vw = innerWidth, vh = innerHeight;
   const kMin = Math.min(vw/SW, vh/SH);
   const kMax = Math.max(vw/SW, vh/SH);
-  const phone = Math.min(vw, vh) <= 600;
+  /* 只有"手机形态"才铺满：短边 ≤600 且长宽比 ≥1.7（≈375×667 起）。
+     分屏窗口、折叠屏展开、小平板这类接近正方的视口仍走 contain，
+     否则 cover 会把上下（而不是左右）裁掉，标题和按钮会被切。 */
+  const phone = Math.min(vw, vh) <= 600 && vh / vw >= 1.70;
 
   let k = phone ? kMax : kMin;
   let crop = 0;
