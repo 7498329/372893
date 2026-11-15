@@ -1641,7 +1641,7 @@ function boot(){
   revealCover(p1);
   paintDots();
 
-  if(new URLSearchParams(location.search).get('t')) setTimeout(runTest, 400);
+  if(new URLSearchParams(location.search).get('t')) setTimeout(()=>afterVeil(runTest), 400);
   if(new URLSearchParams(location.search).get('geo')) setTimeout(geoProbe, 500);
   if(new URLSearchParams(location.search).get('hit')) afterVeil(hitProbe);
   if(new URLSearchParams(location.search).get('click')) afterVeil(clickProbe);
