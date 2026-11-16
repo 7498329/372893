@@ -456,12 +456,17 @@ button{font-family:inherit;color:inherit;border:0;background:none;padding:0;curs
 #p5{overflow:hidden}
 /* 面条从屏幕顶端穿上来，标题下面垫一层纸色渐隐，字才看得清 */
 #p5::before{
-  content:'';position:absolute;left:0;right:0;top:0;height:228px;z-index:26;pointer-events:none;
-  background:linear-gradient(180deg,rgba(243,234,212,.97) 0%,rgba(243,234,212,.93) 54%,rgba(243,234,212,0) 100%);
+  content:'';position:absolute;left:0;right:0;top:0;height:196px;z-index:26;pointer-events:none;
+  /* 上段保持接近实色（滚上来的纸片整块藏到标题后面，不留半透明残影），
+     下段才快速淡出，接上长卷 */
+  background:linear-gradient(180deg,rgba(243,234,212,.985) 0%,rgba(243,234,212,.985) 62%,
+             rgba(243,234,212,.86) 80%,rgba(243,234,212,0) 100%);
 }
 .tlTop{position:absolute;left:calc(var(--crop) + 18px);top:44px;z-index:30}
 .tlTop .k{font-family:var(--serif);font-size:18px;letter-spacing:.38em;color:var(--teal)}
 .tlTop .t{font-family:var(--serif);font-size:39px;letter-spacing:.14em;color:var(--ink);margin-top:6px}
+.tlTop .c{font-family:var(--serif);font-size:15px;letter-spacing:.2em;
+  color:var(--ink3);opacity:.78;margin-top:9px;white-space:nowrap}
 .tlSeal{position:absolute;right:calc(var(--crop) + 18px);top:46px;z-index:30;width:56px;height:56px;font-size:21px}
 .tlViewport{position:absolute;inset:0;overflow:hidden;touch-action:none;cursor:grab}
 .tlViewport.drag{cursor:grabbing}
@@ -469,45 +474,107 @@ button{font-family:inherit;color:inherit;border:0;background:none;padding:0;curs
 .tlTrack.anim{transition:transform .55s var(--ease)}
 .tlSvg{position:absolute;left:0;top:0;pointer-events:none;
   filter:drop-shadow(0 8px 10px rgba(120,84,38,.15))}
-.tlSvg .dye{opacity:0;transition:opacity .45s ease}
-.tlSvg.dyeing .dye{opacity:1}
+/* 正片叠底：红只做「一层辣油」，面的高光与肌理还透出来 */
+.tlSvg .dye{opacity:0;mix-blend-mode:multiply;transition:opacity .5s ease}
+.tlSvg.dyeing .dye{opacity:.94}
 
-.tlNode{
-  position:absolute;z-index:20;
-  width:max(72px,var(--tap));height:max(72px,var(--tap));
-  margin:calc(max(72px,var(--tap)) / -2) 0 0 calc(max(72px,var(--tap)) / -2);
-  display:grid;place-items:center;border-radius:50%;
-  transition:transform .42s var(--spring);
+.tlNode{position:absolute;z-index:22}
+
+/* ---- 章头：一张纸标签横贴在这根面上，两侧各拉出一道细线 ---- */
+.tlCh{
+  left:375px;width:min(560px, calc(100% - 2*var(--crop) - 36px));
+  transform:translate(-50%,-50%);
+  display:flex;align-items:center;gap:15px;
+  padding:14px 16px;border-radius:4px;text-align:left;
+  background:rgba(253,247,233,.975);
+  border:1px solid rgba(150,112,64,.34);
+  box-shadow:0 6px 18px rgba(96,62,24,.15);
+  transition:transform .42s var(--spring),box-shadow .4s ease;
 }
-.tlNode .ring{
-  position:absolute;inset:0;border-radius:50%;
-  border:1.5px solid rgba(184,59,43,.52);
-  background:radial-gradient(50% 50% at 50% 50%,rgba(253,247,233,.97),rgba(250,242,226,.86));
-  box-shadow:0 3px 10px rgba(96,62,24,.22);
-  transition:all .4s var(--ease);
+.tlCh::before,.tlCh::after{
+  content:"";position:absolute;top:50%;height:1px;width:70px;
+  background:linear-gradient(90deg,rgba(150,112,64,0),rgba(150,112,64,.34));
 }
-.tlNode .num{position:relative;font-family:var(--serif);font-size:24px;color:var(--chili);font-weight:700}
-/* 竖版：节点名挪到右侧，让开面条带 */
-.tlNode .lb{
-  position:absolute;left:calc(100% + 12px);top:50%;transform:translateY(-50%);
-  font-family:var(--serif);font-size:17px;letter-spacing:.16em;color:var(--ink3);
-  white-space:nowrap;opacity:.9;transition:opacity .35s ease;
+.tlCh::before{right:100%;transform:scaleX(-1)}
+.tlCh::after{left:100%}
+.tlCh .no{
+  flex:0 0 auto;width:56px;height:56px;border-radius:3px;
+  display:grid;place-items:center;
+  background:var(--chili);color:#fdf7e9;
+  font-family:var(--serif);font-size:29px;line-height:1;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.26);
+  transition:box-shadow .45s ease;
 }
-.tlNode::after{
-  content:"";position:absolute;inset:-9px;border-radius:50%;
-  border:1px solid rgba(184,59,43,.28);opacity:0;pointer-events:none;
+.tlCh .tx{flex:1 1 auto;min-width:0}
+.tlCh .r{display:block;font-family:var(--serif);font-size:16px;
+  letter-spacing:.2em;color:var(--chili);opacity:.92;white-space:nowrap}
+.tlCh .h{display:block;font-family:var(--serif);font-size:28px;
+  letter-spacing:.02em;color:var(--ink);margin-top:4px;line-height:1.22}
+.tlCh .n{flex:0 0 auto;font-family:var(--serif);font-size:15px;
+  letter-spacing:.14em;color:var(--ink3);opacity:.75;white-space:nowrap}
+.tlCh:hover{transform:translate(-50%,-50%) scale(1.012)}
+.tlCh.act{box-shadow:0 10px 26px rgba(184,59,43,.24);border-color:rgba(184,59,43,.5)}
+.tlCh.hot .no{animation:sealBreath 3.6s ease-in-out infinite}
+@keyframes sealBreath{
+  0%,100%{box-shadow:inset 0 0 0 1px rgba(255,255,255,.26),0 0 0 0 rgba(184,59,43,.32)}
+  55%{box-shadow:inset 0 0 0 1px rgba(255,255,255,.26),0 0 0 9px rgba(184,59,43,0)}
 }
-.tlNode.hot::after{animation:pulse 2.8s ease-out infinite}
-@keyframes pulse{0%{opacity:.6;transform:scale(.85)}70%{opacity:0;transform:scale(1.35)}100%{opacity:0}}
-.tlNode:hover{transform:scale(1.06)}
-.tlNode.act{transform:scale(1.14)}
-.tlNode.act .ring{background:var(--chili);border-color:var(--chili);box-shadow:0 6px 18px rgba(184,59,43,.42)}
-.tlNode.act .num{color:#fdf7e9}
-.tlNode.act .lb{opacity:0}
+
+/* ---- 小点：年份 + 短标题的小纸片，左右交错挂在面旁，一道细线牵到面上 ---- */
+.tlSub{
+  width:196px;min-height:max(76px,var(--tap));
+  padding:11px 12px;border-radius:3px;text-align:left;
+  transform:translateY(-50%);
+  background:rgba(253,247,233,.935);
+  border:1px solid rgba(150,112,64,.26);
+  box-shadow:0 4px 13px rgba(96,62,24,.11);
+  transition:transform .38s var(--spring),box-shadow .35s ease,
+             border-color .3s ease,background .3s ease;
+}
+.tlSub[data-side="l"]{text-align:right}
+.tlSub .y{display:block;font-family:var(--serif);font-size:19px;
+  letter-spacing:.05em;color:var(--chili);opacity:.96;white-space:nowrap}
+.tlSub .t{display:block;font-family:var(--serif);font-size:21px;
+  letter-spacing:.01em;color:var(--ink2);margin-top:2px;line-height:1.28}
+.tlSub::after{
+  content:"";position:absolute;top:50%;height:1px;width:30px;
+  background:rgba(150,112,64,.42);
+}
+.tlSub[data-side="l"]::after{right:-30px}
+.tlSub[data-side="r"]::after{left:-30px}
+.tlSub:hover{transform:translateY(-50%) scale(1.025);box-shadow:0 8px 20px rgba(96,62,24,.16)}
+.tlSub.act{
+  transform:translateY(-50%) scale(1.02);
+  background:rgba(255,252,244,.99);
+  border-color:rgba(184,59,43,.55);
+  box-shadow:0 8px 22px rgba(184,59,43,.2);
+}
+.tlSub.act .t{color:var(--ink)}
+
+/* ---- 面钉：点在面条上的小圆点，也吃点击 ---- */
+.tlPin{
+  position:absolute;z-index:21;width:20px;height:20px;margin:-10px 0 0 -10px;
+  border-radius:50%;cursor:pointer;
+  border:2px solid rgba(184,59,43,.72);
+  background:radial-gradient(50% 50% at 50% 38%,#fffaf0,#f4e6ca);
+  box-shadow:0 2px 7px rgba(96,62,24,.26);
+  transition:transform .35s var(--spring),background .3s ease,border-color .3s ease;
+}
+.tlPin::before{content:"";position:absolute;inset:-10px;border-radius:50%}
+.tlPin.act{background:var(--chili);border-color:#fdf7e9;transform:scale(1.3)}
+
+/* ---- 分屏计数：右上角一小行「2 / 5」，跟着长卷走 ---- */
+.tlPg{
+  position:absolute;right:calc(var(--crop) + 18px);top:116px;z-index:31;
+  font-family:var(--serif);font-size:17px;letter-spacing:.1em;color:var(--ink3);
+  opacity:.72;pointer-events:none;white-space:nowrap;
+}
+.tlPg b{font-weight:700;font-size:21px;color:var(--chili);margin-right:3px}
 
 /* 故事面板：竖版固定在屏幕下半部，宽度吃满 620，不跟面条一起滚 */
 .tlPanel{
-  position:absolute;left:50%;bottom:70px;width:600px;z-index:34;
+  position:absolute;left:50%;bottom:70px;z-index:34;
+  width:min(600px, calc(100% - 2*var(--crop) - 40px));
   padding:24px 30px 26px;border-radius:5px;
   background:rgba(253,248,236,.94);
   border:1px solid rgba(96,74,46,.18);
@@ -534,10 +601,13 @@ button{font-family:inherit;color:inherit;border:0;background:none;padding:0;curs
 .tlPanel .x:active{transform:scale(.9);color:var(--chili)}
 
 .tlHint{
-  position:absolute;left:50%;bottom:38px;transform:translateX(-50%);z-index:30;
-  font-size:19px;letter-spacing:.26em;color:var(--ink3);font-family:var(--serif);
-  display:flex;align-items:center;gap:12px;opacity:.85;transition:opacity .4s ease;
-  white-space:nowrap;
+  position:absolute;left:50%;bottom:36px;transform:translateX(-50%);z-index:30;
+  font-size:18px;letter-spacing:.24em;color:var(--ink3);font-family:var(--serif);
+  display:flex;align-items:center;gap:12px;opacity:.85;transition:opacity .45s ease;
+  white-space:nowrap;padding:10px 20px;border-radius:999px;
+  background:rgba(253,247,233,.94);
+  border:1px solid rgba(150,112,64,.22);
+  box-shadow:0 6px 16px rgba(96,62,24,.12);
 }
 .tlHint .ln{width:30px;height:1px;background:rgba(96,74,46,.3)}
 #p5 .nextBtn{bottom:38px}
@@ -713,18 +783,20 @@ html.noanim #p1 .cover{opacity:1!important;transform:none!important}
     <div class="dots" data-dots></div>
   </section>
 
-  <!-- P5 时间轴（横滑三屏） -->
+  <!-- P5 时间轴（一根竖着的长面，五章二十点，五屏竖向滚动） -->
   <section class="page" id="p5">
     <div class="tlTop">
       <div class="k">贰 · 百 年 面 史</div>
       <div class="t">一根面的百年</div>
+      <div class="c">五 个 阶 段 · 二 十 个 节 点</div>
     </div>
     <i class="seal tlSeal">兰州</i>
     <div class="tlViewport" id="tlViewport">
       <div class="tlTrack" id="tlTrack"></div>
     </div>
+    <div class="tlPg" id="tlPg" aria-hidden="true"><b>1</b>/<span>5</span></div>
     <div class="tlHint" id="tlHint">
-      <span class="ln"></span>上下滑动 浏览整根面<span class="ln"></span>
+      <span class="ln"></span>上下滑动 看完整根面<span class="ln"></span>
     </div>
     <button class="nextBtn" id="tlNext" style="display:none">收尾
       <svg viewBox="0 0 19 12"><path d="M1 6h16M12 1l5 5-5 5"/></svg>
@@ -753,23 +825,10 @@ const NOODLES = [
   {n:'五道丝面',r:'乐观',a:'表面压出五道棱丝。', b:'寓五十六族相连，国泰民安。'}
 ];
 
-const HIST = [
-  {yr:'清 嘉 庆', hd:'一担汤面过黄河',
-   d:'东乡族马六七把"小车牛肉老汤面"的技艺带进兰州。他在国子监结识同窗陈维精，得授秘方，带回中原的熬汤老方与手工揉面的底子。这门手艺跨过黄河落户兰州，就此埋下百年风味的伏笔。',
-   pos:'above'},
-  {yr:'1 9 5 6', hd:'兰清阁与师带徒',
-   d:'面馆公私合营，转为国营"兰清阁"。此后二十余年，国营体系以"师带徒"批量培养技师——工艺虽无飞跃，却把原本属于"马家字号"的私技，变成了兰州共有的技术存量。',
-   pos:'below'},
-  {yr:'1 9 7 8 后', hd:'个体复苏与名称错位',
-   d:'自由市场放开，马子禄、马有布等首批个体品牌开张。与此同时，青海化隆人打出"兰州拉面"的招牌走向全国：一个坚守本土的"牛大"，一个外出谋生的"拉面"。',
-   pos:'above'},
-  {yr:'2 0 2 1', hd:'入选国家级非遗',
-   d:'制作技艺入选国家级非遗名录。认定的是"拉制"这个动作——手工揉面、抻拉、出条。机器能压出标准粗细，却复刻不了师傅感知面团筋度与温度的那点活态智慧。',
-   pos:'below'},
-  {yr:'2 0 2 6', hd:'千亿产业与法治引领',
-   d:'全产业链产值突破千亿元，门店总量达 8.2 万家。11 月 1 日，《兰州牛肉拉面产业促进条例》正式施行，从"政策推动"转向"法治引领"，守住风味底线，也为出海立起刚性框架。',
-   pos:'above'}
-];
+/* 时间轴内容（五章 + 二十点）与几何都来自 assets/timeline_v.js —— 由 build_tl2.py 生成，
+   这里不再另存一份，避免文案与坐标两处维护。
+   HIST[i] = {lv:0 章头 / 1 小点, cx, x, cy, u, s, e, yr, sy, hd, d, side} */
+const HIST = window.TL.nodes;
 
 const ITEMS = [
   {id:'beef',   name:'牛肉片', img:'assets/beef.webp',         w:136, slot:[-70,-40], sc:.70, rot:-9},
@@ -883,8 +942,8 @@ function syncInert(){
 }
 
 function paintDots(){
-  let cur = state.page;
-  if(cur === 5) cur = 5 + state.tlIdx;
+  /* 时间轴那 5 屏由右侧 .tlRail 单独表示，这里只亮「第 5 页」一个点 */
+  const cur = state.page;
   $$('[data-dots]').forEach(box=>{
     if(!box.children.length){
       for(let i=0;i<8;i++){
@@ -1289,9 +1348,11 @@ function finishBowl(){
 }
 
 /* =====================================================================
-   P5  时间轴
+   P5  时间轴：五章二十点，全部串在一根面上
    ===================================================================== */
 const TL = window.TL;
+const TL_PAGES = TL.pages || Math.round(TL.canvasH / 1334);
+const TL_LAST  = TL_PAGES - 1;
 let tlBuilt = false;
 
 function buildTimeline(){
@@ -1318,20 +1379,24 @@ function buildTimeline(){
         0.10 0.19 0.04 0 -0.014
         0 0 0 1 0"/>
     </filter>
+    <filter id="maskSoft" x="-20%" y="-2%" width="140%" height="104%">
+      <feGaussianBlur stdDeviation="9"/>
+    </filter>
     <mask id="segMask" maskUnits="userSpaceOnUse" x="0" y="0"
           width="${TL.canvasW}" height="${TL.canvasH}">
       <rect x="0" y="0" width="${TL.canvasW}" height="${TL.canvasH}" fill="#000"/>
-      <path id="segPath" fill="none" stroke="#fff" stroke-width="124"
-            stroke-linecap="round" pathLength="1000"
+      <path id="segPath" fill="none" stroke="#fff" stroke-width="96"
+            stroke-linecap="butt" pathLength="1000"
             stroke-dasharray="0 1200" stroke-dashoffset="0"
+            filter="url(#maskSoft)"
             d="${TL.path}"/>
     </mask>`;
   svg.appendChild(defs);
 
-  // 面条本体（横版素材顺时针转 90° 的竖版，沿新曲线重映射）
+  // 面条本体：一条从嘉庆年间拉到今天的长面（build_tl2.py 生成，中轴与下面 path 同源）
   const rib = TL.ribbon;
   const img = document.createElementNS(NS,'image');
-  img.setAttribute('href','assets/noodle_ribbon_v.webp');
+  img.setAttribute('href','assets/noodle_long.webp');
   img.setAttribute('x', rib.x); img.setAttribute('y', rib.y);
   img.setAttribute('width', rib.w); img.setAttribute('height', rib.h);
   svg.appendChild(img);
@@ -1339,7 +1404,7 @@ function buildTimeline(){
   // 红色段（同一张面，被红色滤镜染色后按 mask 显影）
   const dye = document.createElementNS(NS,'image');
   dye.setAttribute('class','dye');
-  dye.setAttribute('href','assets/noodle_ribbon_v.webp');
+  dye.setAttribute('href','assets/noodle_long.webp');
   dye.setAttribute('x', rib.x); dye.setAttribute('y', rib.y);
   dye.setAttribute('width', rib.w); dye.setAttribute('height', rib.h);
   dye.setAttribute('mask','url(#segMask)');
@@ -1347,47 +1412,85 @@ function buildTimeline(){
   svg.appendChild(dye);
   track.appendChild(svg);
 
-  // 节点：沿面条从上往下排
-  TL.nodes.forEach((nd, i)=>{
-    const data = HIST[i];
+  // 每章下面挂几个小点
+  const CNT = [];
+  let ci = -1;
+  HIST.forEach(d=>{
+    if(d.lv === 0){ CNT.push(0); ci = CNT.length - 1; }
+    else if(ci >= 0) CNT[ci]++;
+  });
+
+  // 节点：章头是横贴的长条纸标签，小点是左右交错的小纸片
+  let chNo = -1;
+  HIST.forEach((d, i)=>{
+    if(d.lv === 0) chNo++;
+
     const btn = document.createElement('button');
-    btn.className = 'tlNode hot';
-    btn.style.left = nd.cx + 'px';
-    btn.style.top  = nd.cy + 'px';
+    btn.type = 'button';
     btn.dataset.i = i;
-    btn.setAttribute('aria-label', data.yr + ' ' + data.hd);
-    btn.innerHTML = `<span class="ring"></span><span class="num">${i+1}</span>
-      <span class="lb">${data.yr}</span>`;
+    btn.style.top = d.cy + 'px';
+    if(d.lv === 0){
+      btn.className = 'tlNode tlCh hot';
+      btn.style.left = '375px';
+      btn.setAttribute('aria-label',
+        `第 ${d.sy} 阶段：${d.hd}，${d.yr}，本段 ${CNT[chNo]} 个节点`);
+      btn.innerHTML = `<span class="no">${d.sy}</span>
+        <span class="tx"><span class="r">${d.yr}</span><span class="h">${d.hd}</span></span>
+        <span class="n">${CNT[chNo]} 点</span>`;
+    }else{
+      btn.className = 'tlNode tlSub';
+      btn.dataset.side = d.side;
+      btn.style.left = (d.side === 'l' ? d.cx - 30 - 196 : d.cx + 30) + 'px';
+      btn.setAttribute('aria-label', `${d.yr}：${d.hd}`);
+      btn.innerHTML = `<span class="y">${d.sy}</span><span class="t">${d.hd}</span>`;
+    }
     btn.addEventListener('click', ()=>openNode(i));
     track.appendChild(btn);
 
+    // 面钉：面条上的小圆点，点它也能开（章头被纸标签盖住，不画）
+    if(d.lv === 1){
+      const pin = document.createElement('i');
+      pin.className = 'tlPin';
+      pin.dataset.i = i;
+      pin.style.left = d.cx + 'px';
+      pin.style.top  = d.cy + 'px';
+      pin.addEventListener('click', ()=>openNode(i));
+      track.appendChild(pin);
+    }
+
     // 故事面板固定在屏幕下半部（挂 #p5，不跟面条一起滚），宽度吃满才读得清
     const p = document.createElement('div');
-    p.className = 'tlPanel';
+    p.className = 'tlPanel' + (d.lv === 0 ? ' ch' : '');
     p.dataset.i = i;
     p.innerHTML = `<button class="x" aria-label="收起故事">×</button>
-      <div class="yr">${data.yr}</div><div class="hd">${data.hd}</div>
-      <div class="bd">${data.d}</div>`;
+      <div class="yr">${d.yr}</div><div class="hd">${d.hd}</div>
+      <div class="bd">${d.d}</div>`;
     p.querySelector('.x').addEventListener('click', closeNode);
     page5.appendChild(p);
   });
 
-  setTimeout(()=>{ if(state.page===5 && state.activeNode===null) openNode(0, true); }, 700);
+
+  $('#tlPg span').textContent = TL_PAGES;
+  updateRail();
+  // ?flat=1 只看长卷本身（不自动弹出第一张故事卡），便于逐屏检视
+  if(!new URLSearchParams(location.search).get('flat')){
+    setTimeout(()=>{ if(state.page===5 && state.activeNode===null) openNode(0, true); }, 700);
+  }
 }
 
 function closeNode(){
   if(state.activeNode === null) return;
   state.activeNode = null;
   $$('.tlNode').forEach(n=>{ n.classList.remove('act'); n.classList.add('hot'); });
+  $$('.tlPin').forEach(p=>p.classList.remove('act'));
   $$('.tlPanel').forEach(p=>p.classList.remove('show'));
   const svg = $('.tlSvg'); if(svg) svg.classList.remove('dyeing');
   snapBack();
 }
 
-/* 读完故事把长卷送回整屏位置：看最后一个节点时会把卷子多拉一截尾部纸张，
-   不送回原位的话，第三屏会停在半途、提示与收尾按钮的位置就不对了 */
+/* 读完故事把长卷送回整屏位置，让收尾按钮与进度点回到该在的那一屏 */
 function snapBack(){
-  const idx = Math.max(0, Math.min(2, Math.round(-currentY / 1334)));
+  const idx = Math.max(0, Math.min(TL_LAST, Math.round(-currentY / 1334)));
   if(Math.abs(currentY + idx*1334) > 2) setTrackY(-idx*1334, true);
   state.tlIdx = idx;
   paintDots();
@@ -1398,46 +1501,42 @@ function openNode(i, silent){
   const nodes = $$('.tlNode');
   const panels = $$('.tlPanel');
   const svg = $('.tlSvg');
-  if(state.activeNode === i && !silent){
-    state.activeNode = null;
-    nodes[i].classList.remove('act');
-    nodes.forEach(n=>n.classList.add('hot'));
-    panels[i].classList.remove('show');
-    svg.classList.remove('dyeing');
-    snapBack();
-    return;
-  }
+  const d = HIST[i];
+  if(state.activeNode === i && !silent){ closeNode(); return; }
+
   state.activeNode = i;
   nodes.forEach((n,k)=>{
     n.classList.toggle('act', k===i);
     n.classList.toggle('hot', k!==i);
   });
+  $$('.tlPin').forEach(p=>p.classList.toggle('act', Number(p.dataset.i) === i));
   panels.forEach((p,k)=>p.classList.toggle('show', k===i));
   updateTlNext();
 
-  // 高亮「该节点所在面段」= 上一节点与下一节点的中点之间
-  const us = TL.nodes.map(n=>n.u);
-  const start = i === 0 ? 4 : (us[i-1] + us[i]) / 2;
-  const end   = i === us.length-1 ? 1000 : (us[i] + us[i+1]) / 2;
-  const len = Math.max(26, end - start);
-  const sp = $('#segPath');
-  sp.setAttribute('stroke-dasharray', `${len} 1200`);
-  sp.setAttribute('stroke-dashoffset', `${-start}`);
-  svg.classList.add('dyeing');
+  // 高亮：小点染它自己那一小段面（约一个节点的长度）；章头不用整段染红，
+  // 长条纸标签自己的红边已经足够表明「选中了哪一章」
+  if(d.lv === 0){
+    svg.classList.remove('dyeing');
+  }else{
+    const len = Math.max(18, d.e - d.s);
+    const sp = $('#segPath');
+    sp.setAttribute('stroke-dasharray', `${len} 1200`);
+    sp.setAttribute('stroke-dashoffset', `${-d.s}`);
+    svg.classList.add('dyeing');
+  }
 
   // 把节点滚到面板上方的安全区（y≈400），否则故事弹出来会把它盖住
-  const need = TL.nodes[i].cy;
-  const target = Math.max(scrollMin(), Math.min(0, 400 - need));
+  const target = Math.max(scrollMin(), Math.min(0, 400 - d.cy));
   if(Math.abs(target - currentY) > 40){
     setTrackY(target, true);
-    state.tlIdx = Math.max(0, Math.min(2, Math.round(-target / 1334)));
+    state.tlIdx = Math.max(0, Math.min(TL_LAST, Math.round(-target / 1334)));
     paintDots();
     updateTlNext();
   }
 }
 
-/* 长卷末尾留一截空白纸张，最后一个节点才可能被滚到面板上方 */
-const TL_TAIL = 620;
+/* 画布正好 5 屏整，滚到底就是最后一屏，不需要额外留尾 */
+const TL_TAIL = 0;
 const scrollMin = () => -(TL.canvasH - 1334 + TL_TAIL);
 
 /* 竖向拖拽 */
@@ -1450,24 +1549,44 @@ function setTrackY(y, animate){
   track.classList.toggle('anim', !!animate);
   track.style.transform = `translateY(${currentY}px)`;
   if(animate) setTimeout(()=>track.classList.remove('anim'), 580);
+  updateRail();
+}
+
+/* 右上角的「n / 5」跟随当前位置（拖到哪儿走到哪儿，不必等吸附） */
+function updateRail(){
+  const box = $('#tlPg');
+  if(!box) return;
+  const on = Math.max(0, Math.min(TL_LAST, Math.round(-currentY / 1334)));
+  box.querySelector('b').textContent = on + 1;
+}
+
+/* 底部「上下滑动」只在刚进来时提示几秒：长卷是一直滚的，固定文字总会压到某张纸片 */
+let hintGone = false, hintT = 0;
+function showHint(){
+  hintGone = false;
+  $('#tlHint').style.opacity = '.85';
+  clearTimeout(hintT);
+  hintT = setTimeout(()=>{ hintGone = true; $('#tlHint').style.opacity = '0'; }, 4200);
 }
 
 function updateTlNext(){
   const btn = $('#tlNext');
-  const atEnd = state.tlIdx >= 2;
+  const atEnd = state.tlIdx >= TL_LAST;
   // 故事卡占着下半屏时先不露收尾按钮，点 × 收起后再出现
   btn.style.display = (atEnd && state.activeNode === null) ? 'flex' : 'none';
-  $('#tlHint').style.opacity = (atEnd || state.activeNode !== null) ? '0' : '.85';
+  $('#tlHint').style.opacity = (atEnd || state.activeNode !== null || hintGone) ? '0' : '.85';
 }
 
 function syncTimeline(instant){
   state.tlIdx = 0;
   setTrackY(0, !instant);
+  showHint();
   updateTlNext();
 }
 
 viewport.addEventListener('pointerdown', (e)=>{
-  if(e.target.closest('.tlNode') || e.target.closest('.tlPanel')) return;
+  if(e.target.closest('.tlNode') || e.target.closest('.tlPin') ||
+     e.target.closest('.tlPanel')) return;
   dragging = true; startY = e.clientY; startTrack = currentY;
   lastY = e.clientY; vy = 0; lastT = performance.now();
   track.classList.remove('anim');
@@ -1491,7 +1610,7 @@ const endDrag = ()=>{
   viewport.classList.remove('drag');
   const projected = currentY + vy * 240;
   let idx = Math.round(-projected / 1334);
-  idx = Math.max(0, Math.min(2, idx));
+  idx = Math.max(0, Math.min(TL_LAST, idx));
   setTrackY(-idx * 1334, true);
   state.tlIdx = idx;
   paintDots();
@@ -1512,7 +1631,7 @@ viewport.addEventListener('wheel', (e)=>{
   if(Math.abs(wheelAcc) < 16) return;
   const dir = wheelAcc > 0 ? 1 : -1;
   wheelAcc = 0;
-  const idx = Math.max(0, Math.min(2, state.tlIdx + dir));
+  const idx = Math.max(0, Math.min(TL_LAST, state.tlIdx + dir));
   if(idx === state.tlIdx){
     if(dir === 1) go(8);              // 已在末屏继续下滚 → 收尾
     return;
@@ -1535,7 +1654,7 @@ addEventListener('keydown', (e)=>{
   const back = e.key === 'ArrowLeft'  || e.key === 'ArrowUp'   || e.key === 'PageUp';
   if(fwd){
     if(state.page === 5){
-      if(state.tlIdx < 2){
+      if(state.tlIdx < TL_LAST){
         state.tlIdx++; setTrackY(-state.tlIdx*1334, true); paintDots(); updateTlNext();
       }else go(8);
     }else if(state.page && state.page < 8){ go(state.page + 1); }
@@ -1612,10 +1731,10 @@ function runTest(){
     ok('toast', $('#toast').classList.contains('show'));
 
     // 4) 时间轴节点
-    openNode(2);
+    openNode(1);
     ok('nodeSeg', $('#segPath').getAttribute('stroke-dasharray') !== '0 1200');
     ok('dyeOn', $('.tlSvg').classList.contains('dyeing'));
-    openNode(4);
+    openNode(24);
     ok('switch', $$('.tlPanel.show').length === 1);
 
     // 5) 复位
@@ -1649,8 +1768,10 @@ function runTest(){
     ok('coordInverse', Math.abs(back.x) < 1 && Math.abs(back.y) < 1);
     const sp = stageP.getBoundingClientRect();
     ok('fitAxis', Math.abs(sp.width - 750*view.k) < 2 && Math.abs(sp.height - 1334*view.k) < 2);
+    // cover：宽度一定铺满；高度允许「crop 顶到 82 后略微收住」，此时宁可露一点纸边，
+    // 也不为了铺满而把 600 版心裁掉
     ok('fitInView', view.crop > 1
-       ? (sp.width >= innerWidth - 1 && Math.abs(sp.height - innerHeight) < 2)
+       ? (sp.width >= innerWidth - 1 && sp.height <= innerHeight + 2)
        : (sp.width <= innerWidth + 2 && sp.height <= innerHeight + 2));
     // 3×2 木牌网格：不压标题牌、不压底部提示与按钮
     const g2 = $('#grid2');
@@ -1664,11 +1785,41 @@ function runTest(){
     const bowlBottom = ba.offsetTop + ba.offsetHeight/2;   // offsetTop 是中心，不含 translate
     ok('trayInCanvas', chips.length === 4 && chipLast.offsetTop > bowlBottom &&
        chipLast.offsetLeft + chipLast.offsetWidth <= 750);
-    // 时间轴：竖版画布 750 宽 × 三屏高，节点严格从上往下
+    // 时间轴：750 宽 × 5 屏整，五章二十点严格从上往下
     const tk = $('#tlTrack');
-    ok('tlVertical', TL.canvasW === 750 && TL.canvasH === 4002 &&
-       Math.abs(tk.offsetHeight - 4002) < 2 &&
+    const nCh = TL.nodes.filter(n=>n.lv === 0).length;
+    ok('tlVertical', TL.canvasW === 750 && TL.canvasH === TL_PAGES*1334 &&
+       Math.abs(tk.offsetHeight - TL.canvasH) < 2 &&
        TL.nodes.every((n,k)=> k === 0 || n.cy > TL.nodes[k-1].cy));
+    // 结构：五章 + 二十点，页面上的章条/小纸片/面钉数量与数据一致
+    ok('tlChapters', nCh === 5 && TL.nodes.length === 25 && TL_PAGES === 5 &&
+       $$('.tlCh').length === 5 && $$('.tlSub').length === 20 && $$('.tlPin').length === 20);
+    // 小点标签必须整块落在 cover 裁切后仍可见的 82..668 安全区里
+    const lbSafe = $$('.tlSub').every(el=>{
+      const r = el.getBoundingClientRect();
+      const l = toStageXY(r.left, r.top + r.height/2).x;
+      const rt = toStageXY(r.right, r.top + r.height/2).x;
+      return l >= 81 && rt <= 669;
+    });
+    ok('tlLabelSafe', lbSafe);
+    // 标签与面钉之间留了空隙：标签内侧边不会盖住面条（面半径 37 + 间距 30）
+    const lbClear = $$('.tlPin').every(pin=>{
+      const i = Number(pin.dataset.i), d = TL.nodes[i];
+      const btn = $('.tlSub[data-i="' + i + '"]');
+      if(!btn) return false;
+      const gap = d.side === 'l'
+        ? d.cx - (parseFloat(btn.style.left) + btn.offsetWidth)
+        : parseFloat(btn.style.left) - d.cx;
+      return gap >= 28;
+    });
+    ok('tlLabelClear', lbClear);
+    // 右上角分屏计数：第一屏 1/5，最后一屏 5/5
+    const pg = $('#tlPg b');
+    const at = y => { setTrackY(y, false); return pg.textContent; };
+    const p0 = at(0), p1 = at(-1334 * TL_LAST);
+    setTrackY(0, false);
+    document.body.dataset.rail = `pg=${p0}->${p1}`;
+    ok('tlPager', p0 === '1' && p1 === String(TL_PAGES));
     // 故事面板：居中、整块在屏幕内，且不压住当前选中的节点
     openNode(1);
     await sleep(700);
@@ -1683,7 +1834,7 @@ function runTest(){
     })();
     ok('panelNoCover', pnlNoCover);
     // 最后一个节点最容易压到面板（它在长卷最末端），单独验一次
-    openNode(4);
+    openNode(TL.nodes.length - 1);
     await sleep(700);
     const pnl5 = $('.tlPanel.show');
     const lastOK = !!pnl5 && (()=>{
@@ -1937,19 +2088,21 @@ function jump(code){
     ITEMS.forEach(it=>{ place($('.chip[data-id="'+it.id+'"]'), it); placedSet.clear(); });
   }
   if(n === 5){
-    state.tlIdx = code==='5c' ? 2 : (code==='5b' ? 1 : 0);
+    showHint();
+    /* 5 = 第一屏不展开；5a…5e = 逐屏定格；5c1 之类不需要，够用 */
+    const sp = { '5a':0, '5b':1, '5c':2, '5d':3, '5e':4 }[code];
+    const sc = parseInt(qs.get('sc') || '', 10);      // ?sc=2 直接停在第二屏，不展开故事卡
+    state.tlIdx = isNaN(sc) ? (sp == null ? 0 : sp) : Math.max(0, Math.min(TL_LAST, sc));
     setTrackY(-state.tlIdx*1334, false);
     updateTlNext();
-    if(code === '5a') openNode(0);
-    if(code === '5b') openNode(2);
-    if(code === '5c') openNode(4);
+    if(sp != null && isNaN(sc)) openNode([0, 6, 11, 16, 21][sp]);
   }
   paintDots();
   if(qs.get('hit')) setTimeout(hitProbe, 600);
 }
 
 /* 调试出口：自动化脚本读内部状态用（const/let 不挂 window） */
-window.__tlTo = i => { state.tlIdx = Math.max(0, Math.min(2, i));
+window.__tlTo = i => { state.tlIdx = Math.max(0, Math.min(TL_LAST, i));
   setTrackY(-state.tlIdx * 1334, false); paintDots(); updateTlNext(); };
 window.__state = ()=>({ page: state.page, tlIdx: state.tlIdx, node: state.activeNode,
                         y: Math.round(currentY), k: view.k, crop: Math.round(view.crop) });
