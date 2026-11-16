@@ -36,6 +36,7 @@
   --ease:cubic-bezier(.32,.72,.30,1);
   --spring:cubic-bezier(.34,1.42,.64,1);
   --crop:0px;   /* 铺满时左右被裁掉的纸边，fitStages() 写入 */
+  --tap:76px;   /* 「实际 38px」换算回逻辑像素的触控目标，fitStages() 按 k 写入 */
 }
 
 *,*::before,*::after{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -204,19 +205,22 @@ button{font-family:inherit;color:inherit;border:0;background:none;padding:0;curs
 }
 .rule{height:1px;background:linear-gradient(90deg,transparent,rgba(96,74,46,.30),transparent)}
 
-/* 翻页按钮：竖版统一放底部正中 */
+/* 翻页按钮：竖版统一放底部正中。
+   真机上 750 宽会被缩到 ~0.63，所以逻辑尺寸必须按"放大 1.5 倍"来设计，
+   字号 23px、上下 padding 17px ≈ 实际 43px 高，才够手指点。 */
 .nextBtn{
-  position:absolute;left:50%;bottom:66px;transform:translateX(-50%);z-index:40;
-  display:flex;align-items:center;gap:9px;
-  padding:14px 24px 14px 28px;border-radius:40px;
-  font-size:21px;letter-spacing:.16em;color:var(--ink2);
+  position:absolute;left:50%;bottom:64px;transform:translateX(-50%);z-index:40;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  min-height:max(70px,var(--tap));
+  padding:17px 28px 17px 32px;border-radius:44px;
+  font-size:23px;letter-spacing:.14em;color:var(--ink2);
   background:rgba(253,247,233,.66);
   border:1px solid rgba(96,74,46,.26);
   backdrop-filter:blur(3px);
   box-shadow:0 3px 14px rgba(96,68,36,.10);
   transition:transform .26s var(--spring),background .26s ease,box-shadow .26s ease;
 }
-.nextBtn svg{width:20px;height:13px;stroke:currentColor;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.nextBtn svg{width:22px;height:14px;stroke:currentColor;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
 .nextBtn:active{transform:translateX(-50%) scale(.94);background:rgba(253,247,233,.92)}
 .nextBtn.is-idle{opacity:.34}
 
@@ -233,13 +237,13 @@ button{font-family:inherit;color:inherit;border:0;background:none;padding:0;curs
   filter:drop-shadow(0 5px 10px rgba(120,72,20,.20));
 }
 .tagL,.tagR{
-  position:absolute;top:40px;
-  font-family:var(--serif);font-size:17px;letter-spacing:.3em;color:var(--ink3);
+  position:absolute;top:38px;
+  font-family:var(--serif);font-size:19px;letter-spacing:.24em;color:var(--ink3);
   white-space:nowrap;
 }
 .tagL{left:calc(var(--crop) + 16px)}
-.tagR{right:calc(var(--crop) + 16px);letter-spacing:.16em}
-.tagR b{color:var(--chili);font-weight:600;font-size:21px;padding:0 2px}
+.tagR{right:calc(var(--crop) + 16px);letter-spacing:.14em}
+.tagR b{color:var(--chili);font-weight:600;font-size:22px;padding:0 2px}
 
 /* 横版两侧的竖排小字，竖版收成「木牌下方一行居中提示」 */
 .sideCol{display:none}
@@ -248,24 +252,27 @@ button{font-family:inherit;color:inherit;border:0;background:none;padding:0;curs
 }
 .sideCol.r .v{
   writing-mode:horizontal-tb;text-orientation:mixed;
-  font-family:var(--serif);font-size:18px;letter-spacing:.32em;text-indent:.32em;
+  font-family:var(--serif);font-size:19px;letter-spacing:.3em;text-indent:.3em;
   color:rgba(96,74,46,.42);white-space:nowrap;
 }
 
 .grid{
   position:absolute;left:50%;top:664px;transform:translate(-50%,-50%);
   display:grid;grid-template-columns:repeat(3,var(--cw));grid-auto-rows:var(--ch);
-  gap:24px 26px;perspective:1500px;
+  gap:24px 26px;
+  /* 透视必须挂在每张牌自己身上：挂在网格上时，离网格中心越远的牌，
+     透视投影把它拉偏得越多，背面文字会整体错位、漏到牌外。 */
 }
 #p2,#p3{--cw:180px;--ch:289px}
 
 .card{
   position:relative;width:var(--cw);height:var(--ch);
-  background:none;transition:opacity .4s ease,filter .4s ease;z-index:1;
+  perspective:1500px;perspective-origin:50% 50%;
+  background:none;z-index:1;
+  transition:opacity .4s ease,filter .4s ease,transform .46s var(--spring);
 }
 .card .lift{
-  position:absolute;inset:0;transition:transform .46s var(--spring);
-  transform-origin:50% 50%;
+  position:absolute;inset:0;
 }
 .card .inner{
   position:absolute;inset:0;transform-style:preserve-3d;
@@ -276,17 +283,62 @@ button{font-family:inherit;color:inherit;border:0;background:none;padding:0;curs
 .card .face img{display:block;width:100%;height:100%;object-fit:contain}
 .card .face.back{transform:rotateY(180deg)}
 .card.focus{z-index:9}
-/* 竖屏上木牌只有 206 宽，翻开时把这张「拿起来」放大到 1.28，背面小字才读得清 */
-.card.focus .lift{transform:scale(1.12);filter:drop-shadow(0 16px 26px rgba(96,62,24,.26))}
-.grid.hasFocus .card:not(.focus){opacity:.86}
+/* 翻开的牌「拿」到画面中心并放大到 1.55，背面小字才读得清；
+   --fx/--fy 由 placeFocus() 按牌与舞台中心的距离算出来。
+   位移与缩放放在 .card 自己身上，而不是里面的 .lift——
+   只动子元素的话，可见的位置和能点的位置会错开一个身位。 */
+.card.focus{transform:translate(var(--fx,0px),var(--fy,0px)) scale(1.55);
+  filter:drop-shadow(0 22px 34px rgba(96,62,24,.34))}
+/* 翻开的牌「拿起来」= 一次模态阅读：其余内容压暗、不可点，点背景或「收起」放回去。
+   为什么必须是模态：牌被移到画面中心放大到 1.55，正好压住网格中间那张，
+   若还允许点别的牌，手指会落在这张牌上，交互就说不清了。 */
+.peekVeil{
+  position:absolute;inset:0;z-index:8;
+  background:rgba(58,42,22,.26);
+  opacity:0;pointer-events:none;transition:opacity .34s ease;
+}
+.page.peeking .peekVeil{opacity:1;pointer-events:auto}
+.page.peeking .grid{z-index:9}
+.page.peeking .grid .card{pointer-events:none}
+.page.peeking .grid .card.focus{pointer-events:auto}
+.grid.hasFocus .card:not(.focus){opacity:.24;filter:blur(1.2px) saturate(.8)}
+/* 只压暗还不够：深色小字在 24% 下依然读得出来，会和正在读的那张抢注意力 */
+.page.peeking .card:not(.focus) .vtxt{opacity:0}
+/* 模态里必须有一个「怎么退出去」的显式出口，不能只靠再点一次牌 */
+.peekClose{
+  position:absolute;left:50%;bottom:64px;z-index:12;
+  display:flex;align-items:center;gap:10px;
+  padding:14px 26px;border-radius:40px;
+  font-family:var(--serif);font-size:23px;letter-spacing:.16em;color:var(--ink2);
+  background:rgba(253,248,236,.96);
+  border:1px solid rgba(96,74,46,.24);
+  box-shadow:0 10px 26px rgba(88,58,24,.18);
+  opacity:0;pointer-events:none;
+  transform:translate(-50%,10px);
+  transition:opacity .3s ease,transform .34s var(--spring);
+}
+.page.peeking .peekClose{opacity:1;pointer-events:auto;transform:translate(-50%,0)}
+.peekClose svg{width:17px;height:17px;stroke:currentColor;stroke-width:1.9;fill:none;stroke-linecap:round}
+/* 翻页按钮的 z-index 比遮罩高，模态期间要一起收掉；
+   「收起」就落在它原来的位置，底部始终只有一个主动作 */
+.page.peeking .nextBtn,.page.peeking .dots{opacity:0;pointer-events:none}
 
+/* 木牌背面：按列切成 span，从右往左排。
+   为什么不直接用一个 vertical-rl 容器 + overflow:hidden？
+   因为 .inner 是 preserve-3d，3D 上下文里 overflow 与 clip-path 都会被忽略，
+   字会漏到牌面外（17px 时刚好没超，字号一大就穿帮）。分列之后每列宽度
+   由字号算出来，天然不会溢出，不依赖任何裁剪行为。 */
 .vtxt{
-  position:absolute;left:23%;right:9%;top:11%;bottom:9%;
+  position:absolute;left:22%;right:13%;top:20%;bottom:8%;
+  display:flex;flex-direction:row-reverse;align-items:center;justify-content:center;
+  /* flex 容器的 min-height:auto 会被内容撑高，absolute 盒子也会跟着长 */
+  min-width:0;min-height:0;
+  font-family:var(--serif);color:#3f2a16;
+}
+.vtxt .col{
   writing-mode:vertical-rl;text-orientation:upright;
-  font-size:17px;line-height:1.5;color:#3f2a16;
-  font-family:var(--serif);letter-spacing:0;
-  padding-top:2px;
-  overflow:hidden;
+  font-size:18px;line-height:1.4;letter-spacing:0;
+  flex:0 0 auto;
 }
 .vtxt b{font-weight:600;color:#7c3a1c}
 .seal2{
@@ -298,7 +350,7 @@ button{font-family:inherit;color:inherit;border:0;background:none;padding:0;curs
 /* ============ P4 拖拽成面（竖版：上标题 / 中碗 / 下食材一排） ============ */
 .p4Top{position:absolute;left:0;right:0;top:48px;text-align:center}
 .p4Top .t{font-family:var(--serif);font-size:37px;letter-spacing:.26em;text-indent:.26em;color:var(--ink)}
-.p4Top .s{margin-top:10px;font-size:17px;letter-spacing:.26em;color:var(--ink3)}
+.p4Top .s{margin-top:10px;font-size:19px;letter-spacing:.24em;color:var(--ink3)}
 
 .bowlArea{position:absolute;left:50%;top:560px;transform:translate(-50%,-50%);width:520px;height:432px;
   transition:transform .95s var(--ease)}
@@ -348,9 +400,9 @@ button{font-family:inherit;color:inherit;border:0;background:none;padding:0;curs
 }
 .chip img{display:block;pointer-events:none;filter:drop-shadow(0 7px 12px rgba(88,58,24,.24))}
 .chip .cap{
-  margin-top:8px;font-size:19px;letter-spacing:.2em;text-indent:.2em;color:var(--ink2);
+  margin-top:8px;font-size:20px;letter-spacing:.16em;text-indent:.16em;color:var(--ink2);
   font-family:var(--serif);white-space:nowrap;
-  padding:3px 12px;border-radius:20px;background:rgba(253,247,233,.55);
+  padding:3px 10px;border-radius:20px;background:rgba(253,247,233,.55);
   border:1px solid rgba(96,74,46,.16);
 }
 .chip.dragging{transition:none;cursor:grabbing;z-index:30}
@@ -408,7 +460,7 @@ button{font-family:inherit;color:inherit;border:0;background:none;padding:0;curs
   background:linear-gradient(180deg,rgba(243,234,212,.97) 0%,rgba(243,234,212,.93) 54%,rgba(243,234,212,0) 100%);
 }
 .tlTop{position:absolute;left:calc(var(--crop) + 18px);top:44px;z-index:30}
-.tlTop .k{font-family:var(--serif);font-size:17px;letter-spacing:.42em;color:var(--teal)}
+.tlTop .k{font-family:var(--serif);font-size:18px;letter-spacing:.38em;color:var(--teal)}
 .tlTop .t{font-family:var(--serif);font-size:39px;letter-spacing:.14em;color:var(--ink);margin-top:6px}
 .tlSeal{position:absolute;right:calc(var(--crop) + 18px);top:46px;z-index:30;width:56px;height:56px;font-size:21px}
 .tlViewport{position:absolute;inset:0;overflow:hidden;touch-action:none;cursor:grab}
@@ -421,7 +473,9 @@ button{font-family:inherit;color:inherit;border:0;background:none;padding:0;curs
 .tlSvg.dyeing .dye{opacity:1}
 
 .tlNode{
-  position:absolute;width:64px;height:64px;margin:-32px 0 0 -32px;z-index:20;
+  position:absolute;z-index:20;
+  width:max(72px,var(--tap));height:max(72px,var(--tap));
+  margin:calc(max(72px,var(--tap)) / -2) 0 0 calc(max(72px,var(--tap)) / -2);
   display:grid;place-items:center;border-radius:50%;
   transition:transform .42s var(--spring);
 }
@@ -432,11 +486,11 @@ button{font-family:inherit;color:inherit;border:0;background:none;padding:0;curs
   box-shadow:0 3px 10px rgba(96,62,24,.22);
   transition:all .4s var(--ease);
 }
-.tlNode .num{position:relative;font-family:var(--serif);font-size:21px;color:var(--chili);font-weight:700}
+.tlNode .num{position:relative;font-family:var(--serif);font-size:24px;color:var(--chili);font-weight:700}
 /* 竖版：节点名挪到右侧，让开面条带 */
 .tlNode .lb{
   position:absolute;left:calc(100% + 12px);top:50%;transform:translateY(-50%);
-  font-family:var(--serif);font-size:15px;letter-spacing:.18em;color:var(--ink3);
+  font-family:var(--serif);font-size:17px;letter-spacing:.16em;color:var(--ink3);
   white-space:nowrap;opacity:.9;transition:opacity .35s ease;
 }
 .tlNode::after{
@@ -453,8 +507,8 @@ button{font-family:inherit;color:inherit;border:0;background:none;padding:0;curs
 
 /* 故事面板：竖版固定在屏幕下半部，宽度吃满 620，不跟面条一起滚 */
 .tlPanel{
-  position:absolute;left:50%;bottom:100px;width:600px;z-index:34;
-  padding:22px 28px 24px;border-radius:5px;
+  position:absolute;left:50%;bottom:70px;width:600px;z-index:34;
+  padding:24px 30px 26px;border-radius:5px;
   background:rgba(253,248,236,.94);
   border:1px solid rgba(96,74,46,.18);
   box-shadow:0 14px 36px rgba(88,58,24,.18);
@@ -464,26 +518,29 @@ button{font-family:inherit;color:inherit;border:0;background:none;padding:0;curs
   pointer-events:none;
 }
 .tlPanel.show{opacity:1;transform:translate(-50%,0) scale(1);pointer-events:auto}
-.tlPanel .yr{font-family:var(--serif);font-size:16px;letter-spacing:.3em;color:var(--chili);opacity:.92}
-.tlPanel .hd{font-family:var(--serif);font-size:30px;letter-spacing:.05em;color:var(--ink);margin:6px 0 10px;line-height:1.28}
-.tlPanel .bd{font-size:18px;line-height:1.9;color:var(--ink2);font-weight:300;letter-spacing:.01em;text-align:justify}
+.tlPanel .yr{font-family:var(--serif);font-size:20px;letter-spacing:.28em;color:var(--chili);opacity:.92}
+.tlPanel .hd{font-family:var(--serif);font-size:33px;letter-spacing:.04em;color:var(--ink);margin:8px 0 12px;line-height:1.28}
+.tlPanel .bd{font-size:22px;line-height:1.82;color:var(--ink2);font-weight:300;letter-spacing:.01em;text-align:justify}
 .tlPanel .stem{display:none}
+/* 关闭按钮：视觉 46、热区再外扩 10（真机 ≥38px），手指点得中又不显得笨重 */
 .tlPanel .x{
-  position:absolute;right:12px;top:12px;width:34px;height:34px;border-radius:50%;z-index:3;
-  display:grid;place-items:center;font-size:20px;line-height:1;color:var(--ink3);
-  background:rgba(253,247,233,.7);border:1px solid rgba(96,74,46,.20);
+  position:absolute;right:10px;top:10px;z-index:3;border-radius:50%;
+  width:max(46px,calc(var(--tap) - 20px));height:max(46px,calc(var(--tap) - 20px));
+  display:grid;place-items:center;font-size:25px;line-height:1;color:var(--ink3);
+  background:rgba(253,247,233,.72);border:1px solid rgba(96,74,46,.20);
   transition:transform .22s var(--spring),color .22s ease;
 }
+.tlPanel .x::before{content:"";position:absolute;inset:-14px;border-radius:50%}
 .tlPanel .x:active{transform:scale(.9);color:var(--chili)}
 
 .tlHint{
-  position:absolute;left:50%;bottom:40px;transform:translateX(-50%);z-index:30;
-  font-size:17px;letter-spacing:.3em;color:var(--ink3);font-family:var(--serif);
+  position:absolute;left:50%;bottom:38px;transform:translateX(-50%);z-index:30;
+  font-size:19px;letter-spacing:.26em;color:var(--ink3);font-family:var(--serif);
   display:flex;align-items:center;gap:12px;opacity:.85;transition:opacity .4s ease;
   white-space:nowrap;
 }
 .tlHint .ln{width:30px;height:1px;background:rgba(96,74,46,.3)}
-#p5 .nextBtn{bottom:44px}
+#p5 .nextBtn{bottom:38px}
 
 /* ============ P8 收尾 ============ */
 #p8 .overline{
@@ -509,11 +566,11 @@ button{font-family:inherit;color:inherit;border:0;background:none;padding:0;curs
 #p8.on .hero{animation:heroIn 1s var(--ease) .12s both}
 @keyframes heroIn{from{opacity:0;transform:translate(-50%,26px)}to{opacity:1;transform:translate(-50%,0)}}
 #p8 .quote{
-  position:absolute;left:50%;top:1000px;transform:translateX(-50%);
-  font-size:20px;line-height:2.1;color:var(--ink3);text-align:center;letter-spacing:.12em;
+  position:absolute;left:50%;top:986px;transform:translateX(-50%);
+  font-size:22px;line-height:2;color:var(--ink3);text-align:center;letter-spacing:.1em;
 }
 .p8Btn{
-  position:absolute;left:50%;top:1136px;transform:translateX(-50%);
+  position:absolute;left:50%;top:1114px;transform:translateX(-50%);
   width:308px;filter:drop-shadow(0 7px 14px rgba(120,72,20,.24));
   transition:transform .26s var(--spring);
 }
@@ -525,10 +582,12 @@ button{font-family:inherit;color:inherit;border:0;background:none;padding:0;curs
 }
 .p8Btn:active{transform:translateX(-50%) scale(.95)}
 #p8 .foot{
-  position:absolute;left:50%;bottom:44px;transform:translateX(-50%);
-  font-size:15px;letter-spacing:.3em;color:var(--ink3);opacity:.7;white-space:nowrap;
+  position:absolute;left:50%;bottom:30px;transform:translateX(-50%);
+  font-size:17px;letter-spacing:.26em;color:var(--ink3);opacity:.72;white-space:nowrap;
 }
 #p8 .dots{display:none}
+/* 封面是整幅海报，进度点会露在「开始制作」按钮下沿，看着像噪点 */
+#p1 .dots{display:none}
 #p8 .p8seal{position:absolute;right:calc(var(--crop) + 18px);top:1004px;width:54px;height:54px;font-size:20px}
 
 @media (prefers-reduced-motion:reduce){
@@ -597,6 +656,10 @@ html.noanim #p1 .cover{opacity:1!important;transform:none!important}
     <div class="sideCol l"><span class="v">一清·二白·三红·四绿·五黄</span></div>
     <div class="sideCol r"><span class="v">轻触木牌·翻看背面</span></div>
     <div class="grid" id="grid2"></div>
+    <div class="peekVeil"></div>
+    <button class="peekClose" type="button">收起
+      <svg viewBox="0 0 18 18"><path d="M4 4l10 10M14 4L4 14"/></svg>
+    </button>
     <button class="nextBtn" data-next="3">下一屏
       <svg viewBox="0 0 19 12"><path d="M1 6h16M12 1l5 5-5 5"/></svg>
     </button>
@@ -613,6 +676,10 @@ html.noanim #p1 .cover{opacity:1!important;transform:none!important}
     <div class="sideCol l"><span class="v">一根面·十二种脾气·任你挑</span></div>
     <div class="sideCol r"><span class="v">轻触木牌·翻看背面</span></div>
     <div class="grid" id="grid3"></div>
+    <div class="peekVeil"></div>
+    <button class="peekClose" type="button">收起
+      <svg viewBox="0 0 18 18"><path d="M4 4l10 10M14 4L4 14"/></svg>
+    </button>
     <button class="nextBtn" data-next="4">下一屏
       <svg viewBox="0 0 19 12"><path d="M1 6h16M12 1l5 5-5 5"/></svg>
     </button>
@@ -746,6 +813,9 @@ function fitStages(){
   stageP.style.transform = `translate(-50%,-50%) scale(${k})`;
   document.documentElement.style.setProperty('--crop', crop.toFixed(1) + 'px');
   document.documentElement.style.setProperty('--safe', (1 - 2*crop/SW).toFixed(4));
+  /* 触控目标按"实际 38px"反算成逻辑尺寸：小屏（k=0.5 的老 SE）自动放大，
+     大屏不无谓膨胀。控件用 max(设计值, var(--tap)) 取大者。 */
+  document.documentElement.style.setProperty('--tap', (38 / k).toFixed(1) + 'px');
   document.body.dataset.fit = `k=${k.toFixed(3)} crop=${crop.toFixed(1)} vw=${vw} vh=${vh}`;
 }
 
@@ -773,6 +843,7 @@ const state = { page:0, tlIdx:0, activeNode:null, busy:false };
 function go(n){
   if(state.busy || n === state.page) return;
   state.busy = true;
+  peekClose();          // 模态状态不能带到下一页
 
   const cur = $('.page.on');
   if(cur){ cur.classList.remove('slow'); cur.classList.remove('on'); }
@@ -790,9 +861,25 @@ function go(n){
     void nx.offsetWidth;
     nx.classList.add('on');
     state.page = n;
+    syncInert();
     paintDots();
     setTimeout(()=>{ state.busy = false; }, 680);
   }, 250);
+}
+
+/* 未激活的页面只做了 opacity:0 —— 视觉上没了，但按钮仍在 Tab 序列里，
+   键盘用户会一路撞进看不见的控件（WCAG 2.4.3 焦点顺序 / 2.4.7 焦点可见）。
+   用 inert 把整页移出焦点树与命中树；同时补 aria-hidden 给读屏。 */
+function syncInert(){
+  $$('.page').forEach(p=>{
+    if(p.id === 'p' + state.page){
+      p.removeAttribute('inert');
+      p.removeAttribute('aria-hidden');
+    }else{
+      p.setAttribute('inert','');
+      p.setAttribute('aria-hidden','true');
+    }
+  });
 }
 
 function paintDots(){
@@ -831,11 +918,9 @@ $('#startBtn').addEventListener('click', ()=>{
   go(2);
 });
 
-/* 以前这里会尝试 requestFullscreen + orientation.lock 锁横屏。
-   那个做法在 Android 上能成，但一进全屏就一直全屏：回到竖屏的收尾页（P8）
-   会被挤在一个横屏视口里缩成小条，退出全屏的入口还不好找。
-   现在改成「把横版舞台转 90° 铺满」——手机竖着拿时画面是横的，
-   用户把手机横过来就是一张正立的满屏横版；系统自动旋转开着的话也自然对上。 */
+/* 收尾页「再拉一碗」：回到首页并清空所有交互状态。
+   这里曾经试过 requestFullscreen + orientation.lock 锁横屏，后来改成旋转舞台，
+   现在 P2–P7 本身就是竖版构图，两者都不再需要——页面不申请全屏、不强锁方向。 */
 $('#resetBtn').addEventListener('click', ()=>{
   resetAll();
   state.page = 0;
@@ -883,6 +968,30 @@ function resetAll(){
    ===================================================================== */
 let flipCount = {2:0, 3:0};
 
+/* 把背面文案切成竖排列：模板里 a 是加粗前缀，b 是正文。
+   每列 8 字（19px × 1.42 行距 ≈ 27，木牌可用高 237 → 8.7 字，取 8 留余量）。
+   切列而不是交给浏览器自动折行，是为了绕开 preserve-3d 下裁剪失效的问题。 */
+const PER_COL = 7;
+function colsHTML(a, b){
+  const chars = [...a].map(c => ({c, bold:true}))
+    .concat([...b].map(c => ({c, bold:false})));
+  const out = [];
+  for(let i = 0; i < chars.length; i += PER_COL){
+    let html = '', bold = null;
+    chars.slice(i, i + PER_COL).forEach(o => {
+      if(o.bold !== bold){
+        if(bold !== null && bold) html += '</b>';
+        if(o.bold) html += '<b>';
+        bold = o.bold;
+      }
+      html += o.c;
+    });
+    if(bold) html += '</b>';
+    out.push('<span class="col">' + html + '</span>');
+  }
+  return out.join('');
+}
+
 function buildGrid(pid, list, offset){
   const g = $('#grid'+pid);
   g.innerHTML = '';
@@ -900,7 +1009,7 @@ function buildGrid(pid, list, offset){
           <div class="face front"><img src="assets/plaque_${nd.n}.webp" alt=""></div>
           <div class="face back">
             <img src="assets/plaque_blank.webp" alt="">
-            <div class="vtxt"><b>${nd.a}</b>${nd.b}</div>
+            <div class="vtxt">${colsHTML(nd.a, nd.b)}</div>
             <i class="seal seal2">${nd.r}</i>
           </div>
         </div>
@@ -909,9 +1018,56 @@ function buildGrid(pid, list, offset){
   });
 }
 
+/* 把某张牌平移到舞台中心的偏移量写进 CSS 变量（放大 1.55 后仍不出界） */
+function placeFocus(card){
+  // 先临时摘掉自身 transform，量到的才是「布局位置」；
+  // 否则连点两张牌时，第二张可能量到上一张还在进行的位移动画。
+  const prev = card.style.transform;
+  card.style.transform = 'none';
+  const cd = card.getBoundingClientRect();
+  card.style.transform = prev;
+  const sd = stageP.getBoundingClientRect();
+  const dx = (sd.left + sd.width/2) - (cd.left + cd.width/2);
+  const dy = (sd.top + sd.height*0.46) - (cd.top + cd.height/2);
+  card.style.setProperty('--fx', (dx / view.k).toFixed(1) + 'px');
+  card.style.setProperty('--fy', (dy / view.k).toFixed(1) + 'px');
+}
+
+/* 拿起一张牌 = 进入模态阅读；收起 = 放回网格 */
+function peekOpen(card){
+  const page = card.closest('.page');
+  if(!page) return;
+  peekClose();
+  placeFocus(card);
+  card.classList.add('focus');
+  page.classList.add('peeking');
+  const g = card.closest('.grid');
+  if(g) g.classList.add('hasFocus');
+}
+
+function peekClose(){
+  const page = $('.page.peeking');
+  if(!page) return;
+  page.classList.remove('peeking');
+  $$('.card.focus', page).forEach(c=>{
+    c.classList.remove('focus');
+    c.style.removeProperty('--fx');
+    c.style.removeProperty('--fy');
+  });
+  $$('.grid.hasFocus', page).forEach(g=>g.classList.remove('hasFocus'));
+}
+
 function onCardTap(card){
   const pid = card.dataset.pid;
   const inner = card.querySelector('.inner');
+
+  /* 已经翻开但还没拿起来的牌：再点一下是「重新拿起来看」，
+     不是翻回正面——否则读完一遍就得翻回去再来一次才能看第二遍。 */
+  if(card.classList.contains('turned') && !card.classList.contains('focus')){
+    peekOpen(card);
+    return;
+  }
+
   const cur = Number(card.dataset.deg) || 0;
   const deg = cur + 180;                 // 每次点击继续同向旋转，累计 360°
   card.dataset.deg = deg;
@@ -927,21 +1083,21 @@ function onCardTap(card){
     $('#c'+pid).textContent = turnedCount;
   }
 
-  // 焦点：放大当前翻开的这张
-  $$('.card').forEach(c=>c.classList.remove('focus'));
+  // 焦点：把翻开的这张「拿」到画面中心放大，背面小字才读得清
   if(nowTurned){
-    card.classList.add('focus');
-    $('#grid'+pid).classList.add('hasFocus');
+    peekOpen(card);
     // 翻牌结束后的 0.2s 轻微回弹
     setTimeout(()=>{
-      card.animate(
+      card.querySelector('.lift').animate(
         [{transform:'scale(1)'},{transform:'scale(1.035)'},{transform:'scale(1)'}],
         {duration:230, easing:'cubic-bezier(.3,.9,.4,1)'}
       );
     }, 900);
   }else{
+    // 翻回正面 → 同时退出模态
+    peekClose();
     setTimeout(()=>{
-      card.animate(
+      card.querySelector('.lift').animate(
         [{transform:'scale(1)'},{transform:'scale(1.025)'},{transform:'scale(1)'}],
         {duration:220, easing:'cubic-bezier(.3,.9,.4,1)'}
       );
@@ -957,8 +1113,11 @@ function refreshFocus(pid){
 }
 
 document.addEventListener('click', (e)=>{
+  if(e.target.closest('.peekClose') || e.target.closest('.peekVeil')){ peekClose(); return; }
   const card = e.target.closest('.card');
   if(card){ onCardTap(card); return; }
+  // 模态期间点牌子之间的空白也算「看完了」
+  if($('.page.peeking') && e.target.closest('.grid')){ peekClose(); return; }
   const next = e.target.closest('[data-next]');
   if(next){ go(Number(next.dataset.next)); }
 });
@@ -1222,6 +1381,16 @@ function closeNode(){
   $$('.tlNode').forEach(n=>{ n.classList.remove('act'); n.classList.add('hot'); });
   $$('.tlPanel').forEach(p=>p.classList.remove('show'));
   const svg = $('.tlSvg'); if(svg) svg.classList.remove('dyeing');
+  snapBack();
+}
+
+/* 读完故事把长卷送回整屏位置：看最后一个节点时会把卷子多拉一截尾部纸张，
+   不送回原位的话，第三屏会停在半途、提示与收尾按钮的位置就不对了 */
+function snapBack(){
+  const idx = Math.max(0, Math.min(2, Math.round(-currentY / 1334)));
+  if(Math.abs(currentY + idx*1334) > 2) setTrackY(-idx*1334, true);
+  state.tlIdx = idx;
+  paintDots();
   updateTlNext();
 }
 
@@ -1235,6 +1404,7 @@ function openNode(i, silent){
     nodes.forEach(n=>n.classList.add('hot'));
     panels[i].classList.remove('show');
     svg.classList.remove('dyeing');
+    snapBack();
     return;
   }
   state.activeNode = i;
@@ -1257,7 +1427,7 @@ function openNode(i, silent){
 
   // 把节点滚到面板上方的安全区（y≈400），否则故事弹出来会把它盖住
   const need = TL.nodes[i].cy;
-  const target = Math.max(-(TL.canvasH - 1334), Math.min(0, 400 - need));
+  const target = Math.max(scrollMin(), Math.min(0, 400 - need));
   if(Math.abs(target - currentY) > 40){
     setTrackY(target, true);
     state.tlIdx = Math.max(0, Math.min(2, Math.round(-target / 1334)));
@@ -1266,14 +1436,17 @@ function openNode(i, silent){
   }
 }
 
+/* 长卷末尾留一截空白纸张，最后一个节点才可能被滚到面板上方 */
+const TL_TAIL = 620;
+const scrollMin = () => -(TL.canvasH - 1334 + TL_TAIL);
+
 /* 竖向拖拽 */
 let currentY = 0, dragging = false, startY = 0, startTrack = 0,
     lastY = 0, vy = 0, lastT = 0;
 const viewport = $('#tlViewport'), track = $('#tlTrack');
 
 function setTrackY(y, animate){
-  const min = -(TL.canvasH - 1334);
-  currentY = Math.max(min, Math.min(0, y));
+  currentY = Math.max(scrollMin(), Math.min(0, y));
   track.classList.toggle('anim', !!animate);
   track.style.transform = `translateY(${currentY}px)`;
   if(animate) setTimeout(()=>track.classList.remove('anim'), 580);
@@ -1357,6 +1530,7 @@ $('#tlNext').addEventListener('click', ()=>go(8));
    键盘（方便桌面预览）
    ===================================================================== */
 addEventListener('keydown', (e)=>{
+  if(e.key === 'Escape'){ peekClose(); closeNode(); return; }
   const fwd  = e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === 'PageDown';
   const back = e.key === 'ArrowLeft'  || e.key === 'ArrowUp'   || e.key === 'PageUp';
   if(fwd){
@@ -1494,16 +1668,69 @@ function runTest(){
     ok('tlVertical', TL.canvasW === 750 && TL.canvasH === 4002 &&
        Math.abs(tk.offsetHeight - 4002) < 2 &&
        TL.nodes.every((n,k)=> k === 0 || n.cy > TL.nodes[k-1].cy));
-    // 故事面板：居中、整块在屏幕内、且不遮住被点的节点
+    // 故事面板：居中、整块在屏幕内，且不压住当前选中的节点
     openNode(1);
-    await sleep(640);
+    await sleep(700);
     const pnl = $('.tlPanel.show');
-    ok('panelFits', !!pnl && (()=>{
-      const r = pnl.getBoundingClientRect(), n1 = $$('.tlNode')[1].getBoundingClientRect();
+    const pnlNoCover = (()=>{
+      if(!pnl) return false;
+      const act = $('.tlNode.act');
+      if(!act) return false;
+      // 只要求「被点开的那一个」露在面板上方。相邻节点可以落在面板背后——
+      // 面板是固定在下半屏的浮层，同屏里别的节点本来就可能被它盖住。
+      return act.getBoundingClientRect().bottom <= pnl.getBoundingClientRect().top + 2;
+    })();
+    ok('panelNoCover', pnlNoCover);
+    // 最后一个节点最容易压到面板（它在长卷最末端），单独验一次
+    openNode(4);
+    await sleep(700);
+    const pnl5 = $('.tlPanel.show');
+    const lastOK = !!pnl5 && (()=>{
+      const act = $('.tlNode.act');
+      return !!act && act.getBoundingClientRect().bottom <= pnl5.getBoundingClientRect().top + 2;
+    })();
+    ok('lastNodeAbovePanel', lastOK);
+    closeNode();
+    await sleep(700);
+    ok('panelInView', !!pnl && (()=>{
+      const r = pnl.getBoundingClientRect();
       return r.left >= -1 && r.right <= innerWidth + 1 &&
-             r.bottom <= innerHeight + 1 && n1.bottom <= r.top + 2;
+             r.top >= -1 && r.bottom <= innerHeight + 1;
     })());
     state.activeNode = null;
+
+    // 8) 真机可读性：木牌背面不裁字、关键控件点得中
+    //     750 宽的画布在 390 手机上会被缩到 0.633，所以按"实际渲染尺寸"判定。
+    //     逐列检查而不是量 scrollHeight：竖排 + flex 的 scroll 尺寸不可靠，
+    //     直接看每列有没有落进牌框，才是「字没有漏到牌外」的真凭据。
+    let colsOK = true;
+    $$('.card').forEach(card => {
+      const cr = card.getBoundingClientRect();
+      card.querySelectorAll('.vtxt .col').forEach(col => {
+        const r = col.getBoundingClientRect();
+        if(r.left < cr.left - 2 || r.right > cr.right + 2 ||
+           r.top < cr.top - 2 || r.bottom > cr.bottom + 2) colsOK = false;
+      });
+    });
+    ok('cardTextFits', $$('.vtxt .col').length >= 24 && colsOK);
+
+    const kk = view.k;
+    /* 注意：getBoundingClientRect() 已经是缩放后的视口像素，不能再乘 k；
+       只有 ::before 的 inset 是逻辑像素，需要乘 k 换算。 */
+    const side = el => Math.min(el.getBoundingClientRect().width,
+                                el.getBoundingClientRect().height);
+    const hitArea = el => {
+      if(!el) return 99;
+      let pad = 0;
+      const m = /(-?[\d.]+)px/.exec(getComputedStyle(el, '::before').inset || '');
+      if(m) pad = Math.abs(parseFloat(m[1]));
+      return side(el) + pad * 2 * kk;
+    };
+    const nodeMin = Math.min(...$$('.tlNode').map(side));
+    const nextMin = side($('#p2 .nextBtn'));
+    const closeHit = hitArea($('.tlPanel .x'));
+    document.body.dataset.tt = `node=${nodeMin.toFixed(1)} next=${nextMin.toFixed(1)} close=${closeHit.toFixed(1)} k=${kk.toFixed(3)}`;
+    ok('touchTargets', nodeMin >= 38 && nextMin >= 38 && closeHit >= 38);
 
     document.title = R.join(' | ');
     document.body.setAttribute('data-test', R.join(' | '));
@@ -1515,10 +1742,14 @@ function runTest(){
    用 elementFromPoint 真实命中测试，逐一验证「看得见的按钮是不是点得到」 */
 function hitProbe(){
   const pg = $('#p' + state.page) || $('.page.on') || document.body;
+  const peeking = !!$('.page.peeking');
   const targets = $$('button, .card, .chip, .tlNode', pg)
     .filter(el=>{
       const r = el.getBoundingClientRect();
       const cs = getComputedStyle(el);
+      // 拿起一张牌读背面时是模态：其余控件本来就被压暗且 pointer-events:none，
+      // 只验「当前这张牌 + 收起」，否则量到的只是刻意的遮挡
+      if(peeking && !el.classList.contains('focus') && !el.classList.contains('peekClose')) return false;
       // 只查「在视口内、看得见」的控件，被时间轴平移出屏幕的不算
       const cx = r.left + r.width/2, cy = r.top + r.height/2;
       // 收起状态的故事面板整块不参与（父级 opacity:0，子元素算出来仍是 1）
@@ -1608,6 +1839,7 @@ function boot(){
   // 首屏
   stageP.classList.add('live');
   state.page = 1;
+  syncInert();
   const dbg = new URLSearchParams(location.search).get('dbg');
   if(dbg){
     jump(dbg);
@@ -1669,6 +1901,7 @@ function jump(code){
   stageP.classList.add('live');
   $('#p'+n).classList.add('on');
   state.page = n;
+  syncInert();
 
   if(code === '2f' || code === '3f'){
     const g = $('#grid'+(code[0]==='2'?2:3));
@@ -1677,7 +1910,7 @@ function jump(code){
       c.dataset.deg = 180;
       c.querySelector('.inner').style.transform = 'rotateY(180deg)';
       c.classList.add('turned');
-      if(i===0) c.classList.add('focus');
+      if(i===0){ peekOpen(c); }
     });
     g.classList.add('hasFocus');
     $('#c'+code[0]).textContent = '3';
