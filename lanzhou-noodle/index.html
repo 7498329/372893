@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#e8dcc2">
 <title>兰州牛肉面 · 一碗面的十二种活法</title>
-<meta name="description" content="一清二白三红四绿五黄。翻开十二块面馆木牌，把牛肉、萝卜、蒜苗和鲜面一样样放进碗里，再顺着一条面条走完这碗面的两百年。">
+<meta name="description" content="一清二白三红四绿五黄。翻开十二块面馆木牌，把牛肉、萝卜、蒜苗和一勺辣椒油一样样点进这碗汤面里，再顺着一条面条走完这碗面的两百年。">
 <meta name="format-detection" content="telephone=no,email=no,address=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -700,7 +700,7 @@ html.noanim #p1 .cover{opacity:1!important;transform:none!important}
         <i class="wisp" style="left:178px;bottom:22px;animation-delay:.4s"></i>
         <i class="wisp" style="left:228px;animation-delay:2s"></i>
       </div>
-      <img class="bowl" src="assets/bowl_empty.webp" alt="一只空的白瓷碗">
+      <img class="bowl" src="assets/bowl_soup.webp" alt="一碗刚盛好的牛肉面汤">
       <i class="bowlShade" aria-hidden="true"></i>
       <i class="target" aria-hidden="true"></i>
       <img class="full" src="assets/bowl_full.webp" alt="一碗完整的牛肉面">
@@ -775,7 +775,7 @@ const ITEMS = [
   {id:'beef',   name:'牛肉片', img:'assets/beef.webp',         w:136, slot:[-70,-40], sc:.70, rot:-9},
   {id:'radish', name:'白萝卜', img:'assets/radish.webp',        w:146, slot:[ 72,-56], sc:.70, rot:7},
   {id:'sprout', name:'青蒜苗', img:'assets/sprout.webp',        w:116, slot:[ 88, 46], sc:.62, rot:-5},
-  {id:'noodle', name:'鲜面条', img:'assets/noodle_bundle.webp', w:160, slot:[-82, 52], sc:.58, rot:-4}
+  {id:'chili',  name:'辣椒油', img:'assets/chili_oil.webp',   w:150, slot:[-82, 52], sc:.80, rot:-4}
 ];
 
 /* =====================================================================
@@ -1130,7 +1130,7 @@ const bowlArea = $('#bowlArea');
 const placedSet = new Set();
 
 /* 各素材的高宽比（用于把一排料的下沿对齐） */
-const RATIO = {beef:429/440, radish:361/440, sprout:509/440, noodle:413/560};
+const RATIO = {beef:429/440, radish:361/440, sprout:509/440, chili:392/520};
 
 function buildTray(){
   tray.innerHTML = '';
@@ -1659,9 +1659,10 @@ function runTest(){
     // 碗与食材排都在画布里
     const ba = $('#bowlArea');
     ok('bowlInCanvas', ba.offsetTop >= 240 && ba.offsetTop + ba.offsetHeight <= 1000);
-    const chipLast = $('.chip[data-id="noodle"]');
+    const chips = $$('.chip');
+    const chipLast = chips[chips.length - 1];      // 最右那一味（位置随素材增减变，按实际取）
     const bowlBottom = ba.offsetTop + ba.offsetHeight/2;   // offsetTop 是中心，不含 translate
-    ok('trayInCanvas', chipLast.offsetTop > bowlBottom &&
+    ok('trayInCanvas', chips.length === 4 && chipLast.offsetTop > bowlBottom &&
        chipLast.offsetLeft + chipLast.offsetWidth <= 750);
     // 时间轴：竖版画布 750 宽 × 三屏高，节点严格从上往下
     const tk = $('#tlTrack');
